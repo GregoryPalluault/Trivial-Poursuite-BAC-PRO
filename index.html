@@ -4,1179 +4,955 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trivial Poursuite Bac Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --fr: #0055A4; --hg: #E8A000; --ms: #009B48; --ps: #E63946;
-    --eg: #7B2D8B; --an: #F4A261; --or: #fff;
-    --bg: #1a1a2e; --card: #16213e; --text: #eaeaea; --muted: #888;
-    --border: rgba(255,255,255,0.12);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+:root{--bg:#1a3a5c;--bg2:#0f2540;--gold:#f0c040;--beige:#d4b896;--beige2:#c9a87a;--white:#fff;--shadow:rgba(0,0,0,0.4);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;}
 
-  /* ÉCRAN ACCUEIL */
-  #screen-join {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 100vh; gap: 20px; padding: 40px;
-  }
-  #screen-join h1 { font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: 1px; }
-  #screen-join h1 span { color: #ffd700; }
-  .join-card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-    padding: 32px; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px;
-  }
-  .join-card label { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .join-card input, .join-card select {
-    background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 8px;
-    color: var(--text); font-size: 1.1rem; padding: 12px 14px; width: 100%;
-  }
-  .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .team-btn {
-    padding: 14px; border-radius: 10px; border: 2px solid transparent;
-    font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all .2s;
-    background: rgba(255,255,255,0.07); color: var(--text);
-  }
-  .team-btn:hover { filter: brightness(1.2); }
-  .team-btn.selected { border-color: #fff; background: rgba(255,255,255,0.18); }
-  .team-btn[data-team="1"] { border-left: 4px solid var(--fr); }
-  .team-btn[data-team="2"] { border-left: 4px solid var(--hg); }
-  .team-btn[data-team="3"] { border-left: 4px solid var(--ms); }
-  .team-btn[data-team="4"] { border-left: 4px solid var(--ps); }
-  .btn-primary {
-    background: #ffd700; color: #111; border: none; border-radius: 10px;
-    padding: 14px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
-    transition: all .2s; width: 100%;
-  }
-  .btn-primary:hover { background: #ffe340; transform: translateY(-1px); }
-  .btn-primary:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+/* ── LOBBY (prof) ── */
+#screen-lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
+.lobby-title{font-family:'Fredoka One',cursive;font-size:2.6rem;color:var(--gold);text-shadow:3px 3px 0 rgba(0,0,0,0.4);text-align:center;line-height:1.1;}
+.lobby-title span{color:#fff;}
+.lobby-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:720px;}
+.lobby-card h2{font-family:'Fredoka One',cursive;color:var(--gold);font-size:1.2rem;margin-bottom:14px;text-align:center;}
+.field-label{display:block;color:rgba(255,255,255,0.6);font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.text-input{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:1.1rem;font-weight:700;padding:10px 14px;width:100%;font-family:'Nunito',sans-serif;text-transform:uppercase;}
+.text-input::placeholder{color:rgba(255,255,255,0.3);text-transform:none;}
+.text-input:focus{outline:none;border-color:var(--gold);}
+.teams-config{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;}
+@media(max-width:520px){.teams-config{grid-template-columns:1fr;}}
+.team-cfg{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;}
+.team-cfg h3{font-size:0.9rem;font-weight:800;margin-bottom:8px;}
+.radio-row{display:flex;gap:6px;flex-wrap:wrap;}
+.radio-row label{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.7);transition:all .15s;display:flex;align-items:center;gap:4px;}
+.radio-row label:has(input:checked){background:rgba(255,255,255,0.22);border-color:#fff;color:#fff;}
+.radio-row input[type=radio]{display:none;}
+.btn-gold{background:linear-gradient(135deg,#f0c040,#e09020);color:#111;border:none;border-radius:14px;padding:14px 40px;font-size:1.1rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(240,192,64,0.35);}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,192,64,0.5);}
+.btn-gold:disabled{background:#444;color:#666;cursor:not-allowed;transform:none;box-shadow:none;}
+.btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 24px;font-size:0.95rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:#fff;background:rgba(255,255,255,0.1);}
 
-  /* ÉCRAN JEU */
-  #screen-game { display: none; height: 100vh; overflow: hidden; }
-  #game-layout { display: grid; grid-template-columns: 1fr 280px; height: 100vh; }
+/* ── QR / LINKS ── */
+#screen-links{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
+.links-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--gold);text-align:center;}
+.links-subtitle{color:rgba(255,255,255,0.6);font-size:0.95rem;text-align:center;max-width:500px;}
+.links-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:100%;max-width:700px;}
+@media(max-width:520px){.links-grid{grid-template-columns:1fr;}}
+.link-card{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.15);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.link-card h3{font-size:1rem;font-weight:800;}
+.link-url{background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;font-size:0.72rem;color:rgba(255,255,255,0.7);word-break:break-all;width:100%;font-family:monospace;}
+.qr-placeholder{width:100px;height:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:rgba(255,255,255,0.3);}
+canvas.qr-canvas{border-radius:8px;}
 
-  /* ZONE PRINCIPALE */
-  #game-main {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 12px; gap: 8px; overflow: hidden; position: relative;
-  }
+/* ── JOIN (équipe) ── */
+#screen-join{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
+.join-title{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--gold);text-align:center;}
+.join-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;text-align:center;}
+.team-badge{display:inline-block;padding:12px 28px;border-radius:14px;font-family:'Fredoka One',cursive;font-size:1.8rem;margin:0 auto;}
+.join-status{font-size:0.9rem;color:rgba(255,255,255,0.6);}
+.join-waiting{display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,0.5);font-size:0.85rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;}
 
-  /* BARRE DU HAUT */
-  #top-bar {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 10px 18px; gap: 12px;
-  }
-  #turn-info { font-size: 1rem; font-weight: 600; }
-  #phase-info { font-size: 0.85rem; color: var(--muted); }
-  #timer-display {
-    font-size: 1.8rem; font-weight: 700; color: #ffd700;
-    min-width: 48px; text-align: center; font-variant-numeric: tabular-nums;
-  }
-  #timer-display.urgent { color: #e63946; animation: pulse .5s infinite alternate; }
-  @keyframes pulse { to { transform: scale(1.15); } }
+/* ── THÈME SELECT ── */
+#screen-themes{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
+.ts-title{font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;text-align:center;}
+.ts-title span{color:var(--gold);}
+.ts-sub{color:rgba(255,255,255,0.55);font-size:0.95rem;text-align:center;}
+.themes-grid-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:680px;width:100%;}
+@media(max-width:580px){.themes-grid-pick{grid-template-columns:repeat(2,1fr);}}
+.tpick{border-radius:14px;padding:18px 10px;text-align:center;cursor:pointer;border:3px solid transparent;transition:all .2s;user-select:none;}
+.tpick:hover{transform:translateY(-3px);filter:brightness(1.2);}
+.tpick.used{opacity:0.25;cursor:not-allowed;pointer-events:none;}
+.tpick-emoji{font-size:2rem;display:block;margin-bottom:5px;}
+.tpick-name{font-size:0.78rem;font-weight:800;color:#fff;text-shadow:1px 1px 3px rgba(0,0,0,0.6);}
+.waiting-msg{color:rgba(255,255,255,0.5);font-size:1rem;text-align:center;display:flex;align-items:center;gap:10px;}
 
-  /* PLATEAU SVG */
-  #board-wrap {
-    flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
-    min-height: 0;
-  }
-  #board-svg { max-width: 100%; max-height: 100%; }
+/* ── JEU ── */
+#screen-game{display:none;height:100vh;overflow:hidden;}
+#game-layout{display:grid;grid-template-columns:1fr 290px;height:100vh;}
+#game-main{display:flex;flex-direction:column;padding:10px;gap:8px;overflow:hidden;}
+#board-wrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;}
+#board-svg{max-width:100%;max-height:100%;}
 
-  /* ZONE ACTION */
-  #action-zone {
-    width: 100%; background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 18px; min-height: 80px;
-    display: flex; align-items: center; justify-content: center; gap: 14px;
-  }
-  #btn-roll {
-    background: linear-gradient(135deg, #ffd700, #ff9500);
-    color: #111; border: none; border-radius: 12px; padding: 14px 32px;
-    font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all .2s;
-  }
-  #btn-roll:hover { transform: scale(1.05); }
-  #btn-roll:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
-  #die-display {
-    font-size: 2.8rem; transition: transform .1s;
-    user-select: none; min-width: 50px; text-align: center;
-  }
-  #die-display.rolling { animation: rollDie .08s infinite; }
-  @keyframes rollDie { 0%{transform:rotate(-8deg)scale(1.1)} 50%{transform:rotate(8deg)scale(0.95)} }
-  .action-msg { font-size: 0.95rem; color: var(--muted); text-align: center; }
+#top-bar{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
+#turn-info{font-family:'Fredoka One',cursive;font-size:1.15rem;}
+#phase-info{font-size:0.8rem;color:rgba(255,255,255,0.5);}
+#timer-wrap{display:flex;align-items:center;gap:8px;}
+#timer-bar-bg{width:110px;height:9px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;}
+#timer-bar{height:100%;border-radius:5px;transition:width .4s linear,background .4s;background:#4ade80;width:100%;}
+#timer-num{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--gold);min-width:34px;text-align:right;}
 
-  /* QUESTION */
-  #question-panel {
-    display: none; width: 100%; background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 18px; flex-direction: column; gap: 12px;
-  }
-  #question-panel.visible { display: flex; }
-  #question-theme-badge {
-    display: inline-block; padding: 4px 12px; border-radius: 20px;
-    font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-    align-self: flex-start;
-  }
-  #question-text { font-size: 1.05rem; font-weight: 600; line-height: 1.5; }
-  #answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .answer-btn {
-    background: rgba(255,255,255,0.07); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 12px 14px; color: var(--text);
-    font-size: 0.95rem; cursor: pointer; text-align: left; transition: all .2s;
-    line-height: 1.4;
-  }
-  .answer-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
-  .answer-btn:disabled { cursor: not-allowed; opacity: 0.6; }
-  .answer-btn.correct { background: rgba(0,155,72,0.3); border-color: #009B48; }
-  .answer-btn.wrong { background: rgba(230,57,70,0.3); border-color: #E63946; }
-  .answer-btn.reveal-correct { background: rgba(0,155,72,0.3); border-color: #009B48; }
-  #result-msg {
-    font-size: 1.1rem; font-weight: 700; text-align: center; padding: 8px;
-    border-radius: 8px; display: none;
-  }
-  #result-msg.win { background: rgba(0,155,72,0.2); color: #4ade80; }
-  #result-msg.lose { background: rgba(230,57,70,0.2); color: #f87171; }
+#action-zone{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 18px;min-height:88px;display:flex;align-items:center;justify-content:center;gap:18px;flex-shrink:0;}
+.action-msg{font-size:0.92rem;color:rgba(255,255,255,0.65);text-align:center;line-height:1.5;max-width:300px;}
+.action-msg strong{color:#fff;}
 
-  /* PANNEAU LATÉRAL */
-  #side-panel {
-    background: var(--card); border-left: 1px solid var(--border);
-    padding: 16px; display: flex; flex-direction: column; gap: 12px;
-    overflow-y: auto;
-  }
-  #side-panel h2 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  .team-panel {
-    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px; transition: all .3s;
-  }
-  .team-panel.active-turn { border-color: #ffd700; box-shadow: 0 0 12px rgba(255,215,0,0.2); }
-  .team-panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-  .team-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-  .team-name-side { font-size: 0.9rem; font-weight: 600; }
-  .team-score { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
-  .fromages-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
-  .fromage-slot {
-    aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3);
-    transition: all .4s; font-size: 1.2rem; background: rgba(255,255,255,0.05);
-  }
-  .fromage-slot.earned { border-width: 0; background: none; }
+#btn-roll{background:none;border:none;cursor:pointer;padding:0;transition:transform .15s;display:flex;flex-direction:column;align-items:center;gap:5px;}
+#btn-roll:hover .die-icon{filter:drop-shadow(0 0 14px rgba(240,192,64,0.8));}
+#btn-roll:active{transform:scale(0.92);}
+#btn-roll:disabled{cursor:not-allowed;opacity:0.35;}
+.die-label{font-size:0.7rem;color:rgba(255,255,255,0.5);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
 
-  /* THEMES LÉGENDE */
-  .legend { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
-  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+#question-panel{display:none;flex-direction:column;gap:9px;width:100%;flex-shrink:0;}
+#question-panel.vis{display:flex;}
+#q-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;align-self:flex-start;}
+#q-text{font-size:.98rem;font-weight:700;color:#fff;line-height:1.5;}
+#q-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.ans-btn{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.14);border-radius:10px;padding:9px 11px;color:#fff;font-size:.85rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;text-align:left;transition:all .18s;line-height:1.4;}
+.ans-btn:hover:not(:disabled){background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.3);}
+.ans-btn:disabled{cursor:not-allowed;}
+.ans-btn.correct{background:rgba(74,222,128,0.22);border-color:#4ade80;color:#4ade80;}
+.ans-btn.wrong{background:rgba(248,113,113,0.22);border-color:#f87171;color:#f87171;}
+.ans-btn.reveal{background:rgba(74,222,128,0.22);border-color:#4ade80;color:#4ade80;}
+#q-result{display:none;text-align:center;font-size:.95rem;font-weight:800;padding:7px 14px;border-radius:10px;}
+#q-result.win{background:rgba(74,222,128,0.18);color:#4ade80;display:block;}
+#q-result.lose{background:rgba(248,113,113,0.18);color:#f87171;display:block;}
 
-  /* MY TEAM BADGE */
-  #my-team-badge {
-    position: fixed; top: 14px; right: 300px; background: var(--card);
-    border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px;
-    font-size: 0.82rem; display: flex; align-items: center; gap: 6px; z-index: 10;
-  }
+/* ── PANNEAU DROITE ── */
+#side-panel{background:var(--bg2);border-left:2px solid rgba(255,255,255,0.07);display:flex;flex-direction:column;overflow-y:auto;padding:14px 12px;gap:12px;}
+.side-section-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--gold);text-align:center;}
+.theme-leg-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:9px;margin-bottom:4px;}
+.tli-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;}
+.tli-name{font-size:.8rem;font-weight:800;color:#fff;}
+.disques-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.disque-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.disque-name{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;}
 
-  /* WINNER */
-  #winner-overlay {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
-    z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
-  }
-  #winner-overlay.visible { display: flex; }
-  #winner-box {
-    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
-    padding: 48px; text-align: center; max-width: 400px;
-  }
-  #winner-box h1 { font-size: 2.5rem; margin-bottom: 8px; }
-  #winner-box p { color: var(--muted); font-size: 1.1rem; }
-  .confetti { font-size: 3rem; }
+/* ── TOAST ── */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(15,20,30,0.96);color:#fff;padding:9px 20px;border-radius:20px;font-size:.88rem;font-weight:700;z-index:500;opacity:0;transition:all .28s;pointer-events:none;border:1px solid rgba(255,255,255,0.12);white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* TOAST */
-  #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
-    font-size: 0.9rem; z-index: 200; opacity: 0; transition: opacity .3s;
-    pointer-events: none;
-  }
-  #toast.show { opacity: 1; }
+/* ── WINNER ── */
+#winner-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
+#winner-overlay.vis{display:flex;}
+#winner-box{background:var(--bg2);border:2px solid rgba(255,255,255,0.12);border-radius:22px;padding:44px;text-align:center;max-width:400px;}
+#winner-box h1{font-family:'Fredoka One',cursive;font-size:2.3rem;margin-bottom:6px;}
+#winner-box p{color:rgba(255,255,255,0.55);font-size:.95rem;margin-bottom:18px;}
 
-  /* PION */
-  .pion { transition: all .5s cubic-bezier(.34,1.56,.64,1); }
-
-  @media (max-width: 900px) {
-    #game-layout { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-    #side-panel { border-left: none; border-top: 1px solid var(--border); max-height: 200px; flex-direction: row; flex-wrap: wrap; overflow-x: auto; }
-  }
+@keyframes rollAnim{0%{transform:rotate(-18deg)scale(1.12)}25%{transform:rotate(14deg)scale(.9)}50%{transform:rotate(-10deg)scale(1.06)}75%{transform:rotate(7deg)scale(.96)}100%{transform:rotate(0)scale(1)}}
+.rolling{animation:rollAnim .55s ease-out;}
+.pion-g{transition:all .5s cubic-bezier(.34,1.56,.64,1);}
 </style>
 </head>
 <body>
 
-<!-- ÉCRAN ACCUEIL -->
-<div id="screen-join">
-  <h1>🎓 Trivial Poursuite <span>Bac Pro</span></h1>
-  <div class="join-card">
-    <div>
-      <label>Code de partie</label>
-      <input id="input-code" type="text" placeholder="Ex: MATHS2024" maxlength="12" style="margin-top:6px; text-transform:uppercase">
+<!-- ══ LOBBY PROF ══ -->
+<div id="screen-lobby">
+  <div class="lobby-title">🎓 Trivial Poursuite <span>Bac Pro</span></div>
+  <div class="lobby-card">
+    <h2>Configuration de la partie</h2>
+    <div style="margin-bottom:16px">
+      <label class="field-label">Code de partie</label>
+      <input class="text-input" id="input-code" placeholder="Ex: MATHS2024" maxlength="12">
     </div>
     <div>
-      <label style="display:block;margin-bottom:8px">Choisir son équipe</label>
-      <div class="team-grid">
-        <button class="team-btn" data-team="1" onclick="selectTeam(1)">🔵 Équipe 1</button>
-        <button class="team-btn" data-team="2" onclick="selectTeam(2)">🟡 Équipe 2</button>
-        <button class="team-btn" data-team="3" onclick="selectTeam(3)">🟢 Équipe 3</button>
-        <button class="team-btn" data-team="4" onclick="selectTeam(4)">🔴 Équipe 4</button>
-      </div>
+      <label class="field-label">Équipes</label>
+      <div class="teams-config" id="teams-config"></div>
     </div>
-    <button class="btn-primary" id="btn-join" onclick="joinGame()" disabled>Rejoindre la partie</button>
   </div>
-  <p style="color:var(--muted);font-size:0.82rem">Tous les appareils entrent le même code de partie</p>
+  <button class="btn-gold" id="btn-create" onclick="createGame()" disabled>Créer la partie →</button>
+  <p style="color:rgba(255,255,255,0.3);font-size:.78rem">Vous êtes le professeur / organisateur</p>
 </div>
 
-<!-- ÉCRAN JEU -->
-<div id="screen-game">
-  <div id="my-team-badge">
-    <span id="my-dot" style="width:10px;height:10px;border-radius:50%;display:inline-block"></span>
-    <span id="my-label"></span>
+<!-- ══ LIENS QR ══ -->
+<div id="screen-links">
+  <div class="links-title">🎉 Partie créée !</div>
+  <div class="links-subtitle">Partagez ces liens avec chaque équipe. Chaque équipe ouvre son propre lien sur son appareil.</div>
+  <div class="links-grid" id="links-grid"></div>
+  <button class="btn-gold" id="btn-go-themes" onclick="goToGame()">Commencer la sélection des thèmes →</button>
+</div>
+
+<!-- ══ JOIN (équipe) ══ -->
+<div id="screen-join">
+  <div class="join-title">🎓 Trivial Poursuite Bac Pro</div>
+  <div class="join-card" id="join-card">
+    <div class="join-waiting"><div class="spinner"></div> Connexion en cours...</div>
   </div>
+</div>
+
+<!-- ══ THÈMES ══ -->
+<div id="screen-themes">
+  <div class="ts-title"><span id="ts-who"></span> choisit un thème</div>
+  <div class="ts-sub" id="ts-sub"></div>
+  <div class="themes-grid-pick" id="themes-grid-pick"></div>
+  <div class="waiting-msg" id="ts-waiting" style="display:none"><div class="spinner"></div><span id="ts-wait-text"></span></div>
+</div>
+
+<!-- ══ JEU ══ -->
+<div id="screen-game">
   <div id="game-layout">
-    <!-- ZONE PRINCIPALE -->
     <div id="game-main">
       <div id="top-bar">
-        <div>
-          <div id="turn-info">Chargement...</div>
-          <div id="phase-info"></div>
+        <div><div id="turn-info">—</div><div id="phase-info"></div></div>
+        <div id="timer-wrap">
+          <div id="timer-bar-bg"><div id="timer-bar"></div></div>
+          <div id="timer-num">—</div>
         </div>
-        <div id="timer-display">—</div>
       </div>
-      <div id="board-wrap">
-        <svg id="board-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-      <div id="action-zone">
-        <span class="action-msg" id="action-msg">En attente...</span>
-      </div>
+      <div id="board-wrap"><svg id="board-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg"></svg></div>
+      <div id="action-zone"><span class="action-msg">Chargement...</span></div>
       <div id="question-panel">
-        <div id="question-theme-badge"></div>
-        <div id="question-text"></div>
-        <div id="answers-grid"></div>
-        <div id="result-msg"></div>
+        <div id="q-badge"></div>
+        <div id="q-text"></div>
+        <div id="q-grid"></div>
+        <div id="q-result"></div>
       </div>
     </div>
-    <!-- PANNEAU LATÉRAL -->
     <div id="side-panel">
-      <h2>Équipes &amp; Fromages</h2>
-      <div id="teams-list"></div>
-      <div class="legend" id="legend"></div>
+      <div class="side-section-title">Thèmes</div>
+      <div id="theme-legend"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;">
+        <div class="side-section-title" style="margin-bottom:8px;">Fromages</div>
+        <div class="disques-grid" id="disques-grid"></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- WINNER -->
 <div id="winner-overlay">
-  <div class="confetti">🏆🧀🎉</div>
+  <div style="font-size:3.5rem">🏆</div>
   <div id="winner-box">
-    <h1 id="winner-title"></h1>
-    <p id="winner-sub"></p>
+    <h1 id="winner-h1"></h1>
+    <p>Tous les fromages collectés ! 🧀</p>
+    <button class="btn-gold" onclick="location.reload()">Nouvelle partie</button>
   </div>
-  <button class="btn-primary" style="max-width:200px" onclick="resetGame()">Nouvelle partie</button>
 </div>
 <div id="toast"></div>
 
-<!-- FIREBASE -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import{getDatabase,ref,set,get,update,onValue}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCvXbl2nz3KAO36yj1q-fcqJ5FxEJG2x6w",
-  authDomain: "trivial-poursuite.firebaseapp.com",
-  databaseURL: "https://trivial-poursuite-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "trivial-poursuite",
-  storageBucket: "trivial-poursuite.firebasestorage.app",
-  messagingSenderId: "287506850350",
-  appId: "1:287506850350:web:79b90d6beadc3297cbb5bf"
-};
+const app=initializeApp({
+  apiKey:"AIzaSyCvXbl2nz3KAO36yj1q-fcqJ5FxEJG2x6w",
+  authDomain:"trivial-poursuite.firebaseapp.com",
+  databaseURL:"https://trivial-poursuite-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"trivial-poursuite",
+  storageBucket:"trivial-poursuite.firebasestorage.app",
+  messagingSenderId:"287506850350",
+  appId:"1:287506850350:web:79b90d6beadc3297cbb5bf"
+});
+const db=getDatabase(app);
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// ═══════════════════════════════════════════════════════
-// CONSTANTES
-// ═══════════════════════════════════════════════════════
-const THEMES = [
-  { id:'fr', label:'Français',          color:'#0055A4', emoji:'📚', icon:'🧀' },
-  { id:'hg', label:'Hist./Géo.',         color:'#E8A000', emoji:'🗺️', icon:'🧀' },
-  { id:'ms', label:'Maths/Sciences',     color:'#009B48', emoji:'📐', icon:'🧀' },
-  { id:'ps', label:'PSE',                color:'#E63946', emoji:'🏥', icon:'🧀' },
-  { id:'eg', label:'Éco-gestion',        color:'#7B2D8B', emoji:'💼', icon:'🧀' },
-  { id:'an', label:'Anglais',            color:'#F4A261', emoji:'🇬🇧', icon:'🧀' },
+/* ══ CONSTANTES ══ */
+const ALL_THEMES=[
+  {id:'fr', label:'Français',           emoji:'📚',color:'#e63946'},
+  {id:'hg', label:'Hist./Géographie',   emoji:'🗺️',color:'#f4a261'},
+  {id:'ms', label:'Mathématiques',      emoji:'📐',color:'#2a9d8f'},
+  {id:'sc', label:'Sciences',           emoji:'🔬',color:'#457b9d'},
+  {id:'an', label:'Anglais',            emoji:'🇬🇧',color:'#8338ec'},
+  {id:'eg', label:'Éco-Gestion',        emoji:'💼',color:'#f4d35e'},
+  {id:'pse',label:'PSE',                emoji:'🏥',color:'#e76f51'},
+  {id:'tech',label:'Technologie',       emoji:'⚙️',color:'#06d6a0'},
 ];
+const TC=['#e63946','#f4a261','#2a9d8f','#8338ec']; // couleurs équipes
+const TN=['Équipe 1','Équipe 2','Équipe 3','Équipe 4'];
 
-const TEAM_COLORS = ['#0055A4','#E8A000','#009B48','#E63946'];
-const TEAM_NAMES  = ['Équipe 1','Équipe 2','Équipe 3','Équipe 4'];
-const TEAM_EMOJIS = ['🔵','🟡','🟢','🔴'];
-
-const PION_EMOJIS = ['🔵','🟡','🟢','🔴'];
-
-// ═══════════════════════════════════════════════════════
-// PLATEAU — STRUCTURE
-// 6 rayons, 3 anneaux (ext=12 cases, mid=6 cases, hub=centre)
-// anneau ext : cases 0..71  (12 par secteur)
-// anneau mid : cases 100..105 (1 par secteur, extrémité rayon)
-// centre     : case 200
-// cases rejouer : 6 (une au milieu de chaque secteur ext)
-// cases choix   : 3 (espacées)
-// cases camembert : 100..105
-// ═══════════════════════════════════════════════════════
-
-// Coordonnées polaires → cartésiennes (cx=350, cy=350)
-const CX=350, CY=350;
-const R_EXT=270, R_MID=165, R_HUB=55;
-const SEGMENTS=6, OUTER_PER_SEG=12;
-
-function polar(r, angleDeg){ 
-  const a = (angleDeg-90)*Math.PI/180;
-  return { x: CX + r*Math.cos(a), y: CY + r*Math.sin(a) };
-}
-
-// Générer toutes les cases
-// Anneau ext : 72 cases numérotées 0..71
-// Anneau mid : 6 cases numérotées 100..105 (extrémités rayons)
-// Centre : case 200
-// Cases spéciales rejouer : anneau ext case milieu de chaque secteur (cases 6,18,30,42,54,66)
-// Cases choix libre : cases 3,27,51 (3 cases espacées 120°)
-
-function getCaseAngle(id){
-  if(id===200) return 0;
-  if(id>=100&&id<=105) return (id-100)*60; // extrémité rayon i
-  // anneau ext : 72 cases, case 0 en haut
-  return (id/72)*360;
-}
-
-function getCasePos(id){
-  if(id===200) return {x:CX,y:CY};
-  if(id>=100&&id<=105){
-    const ang=(id-100)*60;
-    return polar(R_MID, ang);
-  }
-  const ang=(id/72)*360;
-  return polar(R_EXT, ang);
-}
-
-function getCaseTheme(id){
-  if(id===200) return null; // centre
-  if(id>=100&&id<=105) return THEMES[id-100];
-  // anneau ext : 72/6=12 par secteur
-  return THEMES[Math.floor(id/12)%6];
-}
-
-function isCamembert(id){ return id>=100&&id<=105; }
-function isRejouer(id){ return [6,18,30,42,54,66].includes(id); }
-function isChoixLibre(id){ return [3,27,51].includes(id); }
-
-// Adjacences pour navigation
-function getAdjacents(pos){
-  const adjs=[];
-  if(pos===200){
-    // depuis centre on peut aller sur chaque extrémité rayon
-    for(let i=0;i<6;i++) adjs.push(100+i);
-    return adjs;
-  }
-  if(pos>=100&&pos<=105){
-    // depuis extrémité rayon : centre + cases ext adjacentes
-    adjs.push(200);
-    const sect=pos-100;
-    const extBase=sect*12;
-    adjs.push(extBase, (extBase+11)%72); // deux cases ext en bordure du secteur
-    // aussi depuis le milieu du secteur sur l'anneau
-    for(let d=-2;d<=2;d++){
-      const c=(extBase+6+d+72)%72;
-      if(!adjs.includes(c)) adjs.push(c);
-    }
-    return adjs;
-  }
-  // anneau ext : voisins gauche/droite + accès rayon si c'est le début de secteur
-  adjs.push((pos+1)%72, (pos-1+72)%72);
-  // si case est la première du secteur, accès à l'extrémité rayon
-  if(pos%12===0) adjs.push(100+(pos/12));
-  return adjs;
-}
-
-// Cases atteignables depuis pos en lançant dieVal
-function getReachable(pos, dieVal){
-  // BFS pour trouver toutes les cases à exactement dieVal de distance
-  // on autorise aussi à choisir une case à distance ≤ dieVal (comme au TP)
-  const visited = new Map(); // case -> distance
-  const queue = [{id:pos, dist:0}];
-  visited.set(pos,0);
-  while(queue.length){
-    const {id,dist}=queue.shift();
-    if(dist>=dieVal) continue;
-    for(const nb of getAdjacents(id)){
-      if(!visited.has(nb)){
-        visited.set(nb,dist+1);
-        queue.push({id:nb,dist:dist+1});
-      }
-    }
-  }
-  // retourner cases à distance exacte = dieVal (et cases camembert si dieVal dépasse)
-  const result=[];
-  for(const [id,d] of visited){
-    if(id!==pos && d===dieVal) result.push(id);
-  }
-  return result;
-}
-
-// ═══════════════════════════════════════════════════════
-// BANQUE DE QUESTIONS (placeholder)
-// ═══════════════════════════════════════════════════════
-const QUESTIONS = {
+const QUESTIONS={
   fr:[
-    {q:"Quel est le COD dans : 'Le professeur corrige les copies' ?", opts:["le professeur","corrige","les copies","le corrigé"], ans:2},
-    {q:"Quelle figure de style est utilisée dans 'La vie est un long fleuve tranquille' ?", opts:["métaphore","hyperbole","allitération","anaphore"], ans:0},
-    {q:"Quel temps verbal exprime une action antérieure à une autre au passé ?", opts:["imparfait","passé simple","plus-que-parfait","conditionnel passé"], ans:2},
-    {q:"Quel registre de langue correspond à : 'Je ne sais pas' ?", opts:["familier","courant","soutenu","argotique"], ans:1},
-    {q:"Un texte argumentatif a pour but de...", opts:["raconter une histoire","décrire un paysage","convaincre le lecteur","expliquer un phénomène"], ans:2},
+    {q:"Quel est le COD dans : 'Le prof corrige les copies' ?",opts:["Le prof","Corrige","Les copies","Le corrigé"],ans:2},
+    {q:"Quelle figure de style : 'La vie est un long fleuve tranquille' ?",opts:["Métaphore","Hyperbole","Allitération","Anaphore"],ans:0},
+    {q:"Quel temps exprime une action antérieure au passé ?",opts:["Imparfait","Passé simple","Plus-que-parfait","Conditionnel passé"],ans:2},
+    {q:"Registre de langue de : 'Je ne sais pas' ?",opts:["Familier","Courant","Soutenu","Argotique"],ans:1},
+    {q:"Un texte argumentatif a pour but de...",opts:["Raconter","Décrire","Convaincre","Expliquer"],ans:2},
+    {q:"Qu'est-ce qu'un homonyme ?",opts:["Même sens","Sens contraire","Même son, sens différent","Même famille"],ans:2},
   ],
   hg:[
-    {q:"En quelle année a eu lieu la Révolution française ?", opts:["1789","1799","1776","1804"], ans:0},
-    {q:"Quelle est la capitale de l'Australie ?", opts:["Sydney","Melbourne","Canberra","Brisbane"], ans:2},
-    {q:"Quel fleuve traverse Paris ?", opts:["Loire","Rhône","Garonne","Seine"], ans:3},
-    {q:"Qui était le président français durant la 2ème Guerre mondiale ?", opts:["Pétain","De Gaulle","Léon Blum","Pompidou"], ans:0},
-    {q:"Quel pays est le plus peuplé du monde en 2024 ?", opts:["Chine","États-Unis","Inde","Brésil"], ans:2},
+    {q:"En quelle année la Révolution française a-t-elle eu lieu ?",opts:["1789","1799","1776","1804"],ans:0},
+    {q:"Quelle est la capitale de l'Australie ?",opts:["Sydney","Melbourne","Canberra","Brisbane"],ans:2},
+    {q:"Quel fleuve traverse Paris ?",opts:["Loire","Rhône","Garonne","Seine"],ans:3},
+    {q:"Quel pays est le plus peuplé du monde ?",opts:["Chine","États-Unis","Inde","Brésil"],ans:2},
+    {q:"Quel continent est traversé par l'équateur ?",opts:["Asie","Afrique","Amérique du Sud","Océanie"],ans:1},
+    {q:"En quelle année a eu lieu le débarquement de Normandie ?",opts:["1942","1943","1944","1945"],ans:2},
   ],
   ms:[
-    {q:"Combien font 2³ × 2⁴ ?", opts:["2⁷","2¹²","64","32"], ans:0},
-    {q:"Quelle est la formule de l'eau ?", opts:["CO₂","H₂O","NaCl","O₂"], ans:1},
-    {q:"Quelle est la dérivée de f(x) = x² ?", opts:["x","2x","x²","2x²"], ans:1},
-    {q:"Dans un triangle rectangle, sin(30°) =", opts:["√3/2","1/2","√2/2","1"], ans:1},
-    {q:"Quelle est l'unité du courant électrique ?", opts:["Volt","Ohm","Ampère","Watt"], ans:2},
+    {q:"Combien font 2³ × 2⁴ ?",opts:["2⁷","2¹²","64","32"],ans:0},
+    {q:"Dérivée de f(x) = x² ?",opts:["x","2x","x²","2x²"],ans:1},
+    {q:"sin(30°) = ?",opts:["√3/2","1/2","√2/2","1"],ans:1},
+    {q:"Développement de (a+b)² ?",opts:["a²+b²","a²+ab+b²","a²+2ab+b²","2a+2b"],ans:2},
+    {q:"log₁₀(1000) = ?",opts:["2","3","10","100"],ans:1},
+    {q:"Aire d'un disque de rayon r ?",opts:["2πr","πr²","πr","2πr²"],ans:1},
   ],
-  ps:[
-    {q:"Que signifie PSE ?", opts:["Prévention Santé Environnement","Protection Sociale Entreprise","Prévention Sécurité Emploi","Protection Santé Emploi"], ans:0},
-    {q:"Quelle loi encadre le droit du travail en France ?", opts:["Code civil","Code pénal","Code du travail","Code de commerce"], ans:2},
-    {q:"À quel âge peut-on travailler légalement en France (apprentissage) ?", opts:["14 ans","15 ans","16 ans","18 ans"], ans:1},
-    {q:"Qu'est-ce que le TMS en milieu professionnel ?", opts:["Trouble Mental Sévère","Trouble Musculo-Squelettique","Taux de Mortalité Sectoriel","Temps de Mise en Sécurité"], ans:1},
-    {q:"Quel organisme gère l'assurance maladie en France ?", opts:["URSSAF","CPAM","Pôle Emploi","CARSAT"], ans:1},
-  ],
-  eg:[
-    {q:"Qu'est-ce que le PIB ?", opts:["Produit Intérieur Brut","Prix Indicatif de Base","Plan d'Investissement Budgétaire","Profit Individuel Brut"], ans:0},
-    {q:"Un bilan comptable est composé de...", opts:["recettes et dépenses","actif et passif","charges et produits","bénéfices et pertes"], ans:1},
-    {q:"Que signifie CDD ?", opts:["Contrat De Durée","Contrat à Durée Déterminée","Contrat Déclaré Définitif","Contrat De Départ"], ans:1},
-    {q:"Qu'est-ce que la TVA ?", opts:["Taxe sur la Valeur Ajoutée","Taxe sur les Ventes Annuelles","Taux de Variation des Actifs","Taxe sur les Virements Automatiques"], ans:0},
-    {q:"Un compte courant d'associé est classé dans...", opts:["les capitaux propres","les immobilisations","les dettes financières","les stocks"], ans:2},
+  sc:[
+    {q:"Formule de l'eau ?",opts:["CO₂","H₂O","NaCl","O₂"],ans:1},
+    {q:"Unité du courant électrique ?",opts:["Volt","Ohm","Ampère","Watt"],ans:2},
+    {q:"Symbole chimique du fer ?",opts:["Fe","Fr","Fi","Fo"],ans:0},
+    {q:"Un acide a un pH...",opts:["Supérieur à 7","Égal à 7","Inférieur à 7","Nul"],ans:2},
+    {q:"Loi qui relie U, R et I ?",opts:["Newton","Ohm","Faraday","Coulomb"],ans:1},
+    {q:"Quelle est la vitesse de la lumière dans le vide ?",opts:["300 km/s","300 000 km/s","3 000 km/s","30 000 km/s"],ans:1},
   ],
   an:[
-    {q:"What is the past tense of 'go'?", opts:["goed","went","gone","go"], ans:1},
-    {q:"'I work here since 5 years' — correct?", opts:["Yes","No, use 'have worked'","No, use 'worked'","No, use 'am working'"], ans:1},
-    {q:"What does 'deadline' mean in French?", opts:["Ligne morte","Limite de temps","Date limite","Fin de journée"], ans:2},
-    {q:"Which is formal English?", opts:["Hey, what's up?","How are you doing?","I trust this email finds you well.","Wanna meet?"], ans:2},
-    {q:"'Could you please send me the report?' — quel type de phrase ?", opts:["order","request","statement","question"], ans:1},
+    {q:"Past tense of 'go'?",opts:["Goed","Went","Gone","Goo"],ans:1},
+    {q:"'I work here since 5 years' — correct?",opts:["Yes","No, use 'have worked'","No, use 'worked'","No, use 'am working'"],ans:1},
+    {q:"'Deadline' means?",opts:["Ligne morte","Limite de temps","Date limite","Fin de journée"],ans:2},
+    {q:"Which is formal English?",opts:["Hey what's up?","How are you?","I trust this email finds you well.","Wanna meet?"],ans:2},
+    {q:"'Enterprise' in French?",opts:["Entreprise","Entreprendre","Entrepreneur","Entrepris"],ans:0},
+    {q:"'Could you please' is a...",opts:["Order","Request","Statement","Question"],ans:1},
+  ],
+  eg:[
+    {q:"PIB signifie ?",opts:["Produit Intérieur Brut","Prix Indicatif de Base","Plan d'Investissement Budgétaire","Profit Individuel Brut"],ans:0},
+    {q:"Un bilan est composé de...",opts:["Recettes et dépenses","Actif et passif","Charges et produits","Bénéfices et pertes"],ans:1},
+    {q:"CDD signifie ?",opts:["Contrat De Durée","Contrat à Durée Déterminée","Contrat Déclaré Définitif","Contrat De Départ"],ans:1},
+    {q:"TVA = ?",opts:["Taxe sur la Valeur Ajoutée","Taxe sur les Ventes Annuelles","Taux de Variation des Actifs","Taxe sur les Virements"],ans:0},
+    {q:"La comptabilité générale enregistre...",opts:["Les flux internes","Les flux externes","Les stocks uniquement","Les salaires uniquement"],ans:1},
+    {q:"Un CDI est...",opts:["Limité dans le temps","Sans limite de durée","Saisonnier","Renouvelable une fois"],ans:1},
+  ],
+  pse:[
+    {q:"PSE signifie ?",opts:["Prévention Santé Environnement","Protection Sociale Entreprise","Prévention Sécurité Emploi","Protection Santé Emploi"],ans:0},
+    {q:"Âge minimum pour l'apprentissage ?",opts:["14 ans","15 ans","16 ans","18 ans"],ans:1},
+    {q:"TMS = ?",opts:["Trouble Mental Sévère","Trouble Musculo-Squelettique","Taux de Mortalité Sectoriel","Temps de Mise en Sécurité"],ans:1},
+    {q:"Qui gère l'assurance maladie ?",opts:["URSSAF","CPAM","Pôle Emploi","CARSAT"],ans:1},
+    {q:"Le port des EPI est...",opts:["Facultatif","Obligatoire","Recommandé","Optionnel"],ans:1},
+    {q:"Qu'est-ce que le document unique ?",opts:["Fiche de paie","Inventaire des risques","Contrat de travail","Règlement intérieur"],ans:1},
+  ],
+  tech:[
+    {q:"Un microcontrôleur est...",opts:["Un petit ordinateur sur puce","Un type de mémoire","Un capteur","Un réseau"],ans:0},
+    {q:"CAO signifie ?",opts:["Conception Assistée par Ordinateur","Calcul Automatique d'Objets","Commande par Auto-Opération","Codage Automatisé d'Objets"],ans:0},
+    {q:"Un schéma cinématique représente...",opts:["Les mouvements","Un plan électrique","Un diagramme de flux","Une vue en coupe"],ans:0},
+    {q:"La RDM étudie...",opts:["La conductivité","Les contraintes dans les matériaux","La dureté","La chaleur"],ans:1},
+    {q:"Un vérin hydraulique transforme...",opts:["L'électricité en mouvement","La pression en force","La chaleur en énergie","Le gaz en liquide"],ans:1},
+    {q:"La norme ISO concerne...",opts:["Les impôts","La qualité et normalisation","Les salaires","Les brevets"],ans:1},
   ],
 };
+function getQ(tid){const p=QUESTIONS[tid]||QUESTIONS.fr;return p[Math.floor(Math.random()*p.length)];}
 
-function getQuestion(themeId){
-  const pool = QUESTIONS[themeId];
-  return pool[Math.floor(Math.random()*pool.length)];
+/* ══ GÉOMÉTRIE PLATEAU ══ */
+const CX=350,CY=350,R_OUT=285,R_MID=185,R_HUB=52;
+function rad(deg){return(deg-90)*Math.PI/180;}
+function rad2(deg){return deg*Math.PI/180;}
+function polar(r,deg){return{x:CX+r*Math.cos(rad(deg)),y:CY+r*Math.sin(rad(deg))};}
+function casePos(id){
+  if(id===200)return{x:CX,y:CY};
+  if(id>=100&&id<=105)return polar(R_MID,(id-100)*60);
+  return polar(R_OUT,(id/54)*360);
+}
+function caseThemeIdx(id){
+  if(id===200)return-1;
+  if(id>=100&&id<=105)return id-100;
+  return Math.floor(id/9)%6;
+}
+function isCamembert(id){return id>=100&&id<=105;}
+function isRejouer(id){return[4,13,22,31,40,49].includes(id);}
+function isChoixLibre(id){return[9,27,45].includes(id);}
+function isBeige(id){return(id%9)%2===0;}
+
+function getAdj(pos){
+  const a=[];
+  if(pos===200){for(let i=0;i<6;i++)a.push(100+i);return a;}
+  if(pos>=100&&pos<=105){
+    a.push(200);
+    const s=pos-100,b=s*9;
+    a.push(b,(b+8)%54);
+    return a;
+  }
+  a.push((pos+1)%54,(pos-1+54)%54);
+  if(pos%9===0)a.push(100+(pos/9)%6);
+  return a;
+}
+function getReachable(pos,die){
+  const vis=new Map();const q=[{id:pos,d:0}];vis.set(pos,0);
+  while(q.length){const{id,d}=q.shift();if(d>=die)continue;for(const nb of getAdj(id))if(!vis.has(nb)){vis.set(nb,d+1);q.push({id:nb,d:d+1});}}
+  const r=[];for(const[id,d]of vis)if(id!==pos&&d===die)r.push(id);
+  return r;
 }
 
-// ═══════════════════════════════════════════════════════
-// ÉTAT LOCAL
-// ═══════════════════════════════════════════════════════
-let myTeam=null, gameCode=null, gameRef=null, unsubscribe=null;
-let timerInterval=null, timerVal=0;
-let localGameState=null;
-let selectedCell=null, answeredThisTurn=false;
-
-// ═══════════════════════════════════════════════════════
-// JOIN
-// ═══════════════════════════════════════════════════════
-window.selectTeam=function(t){
-  myTeam=t;
-  document.querySelectorAll('.team-btn').forEach(b=>b.classList.remove('selected'));
-  document.querySelector(`.team-btn[data-team="${t}"]`).classList.add('selected');
-  checkJoinReady();
-};
-document.getElementById('input-code').addEventListener('input',checkJoinReady);
-function checkJoinReady(){
-  const code=document.getElementById('input-code').value.trim();
-  document.getElementById('btn-join').disabled = !(code.length>=3 && myTeam);
+/* ══ DÉ SVG ══ */
+const DOTS={1:[[0,0]],2:[[-1,-1],[1,1]],3:[[-1,-1],[0,0],[1,1]],4:[[-1,-1],[1,-1],[-1,1],[1,1]],5:[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],6:[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]};
+function dieSVG(face,sz=68,cols){
+  cols=cols||['#e63946','#f4a261','#2a9d8f','#8338ec','#f4d35e','#e76f51'];
+  const cx=sz/2,cy=sz/2,r=sz/2-2;
+  let s=`<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<6;i++){const a1=rad2(i*60-90),a2=rad2((i+1)*60-90);s+=`<path d="M ${cx} ${cy} L ${cx+r*Math.cos(a1)} ${cy+r*Math.sin(a1)} A ${r} ${r} 0 0 1 ${cx+r*Math.cos(a2)} ${cy+r*Math.sin(a2)} Z" fill="${cols[i]}"/>`;}
+  s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>`;
+  const ds=sz*.44;
+  s+=`<rect x="${cx-ds/2}" y="${cy-ds/2}" width="${ds}" height="${ds}" rx="${ds*.14}" fill="white" stroke="rgba(0,0,0,0.15)" stroke-width=".8"/>`;
+  const step=ds*.28;(DOTS[face]||DOTS[1]).forEach(([dx,dy])=>{s+=`<circle cx="${cx+dx*step}" cy="${cy+dy*step}" r="${ds*.1}" fill="#222"/>`;});
+  return s+'</svg>';
 }
 
-window.joinGame=async function(){
-  const code=document.getElementById('input-code').value.trim().toUpperCase();
-  gameCode=code;
-  gameRef=ref(db,`games/${code}`);
-  const snap=await get(gameRef);
-  if(!snap.exists()){
-    await initGame();
+/* ══ ÉTAT ══ */
+let myRole=null; // 'host' | 'team'
+let myTeam=null; // 1-4 (si role=team)
+let gameCode=null,gameRef=null,localState=null,timerInt=null,boardBuilt=false;
+let activeThemes=[];
+
+/* ══ DÉTECTION RÔLE VIA URL ══ */
+function parseURL(){
+  const p=new URLSearchParams(location.search);
+  const code=p.get('code');const team=parseInt(p.get('team'));
+  if(code&&team>=1&&team<=4)return{role:'team',code,team};
+  return{role:'host'};
+}
+
+window.addEventListener('load',()=>{
+  const{role,code,team}=parseURL();
+  if(role==='team'){
+    myRole='team';myTeam=team;gameCode=code.toUpperCase();
+    showScreen('join');connectAsTeam();
   } else {
-    // rejoindre partie existante
-    await update(ref(db,`games/${code}/players`),{[`team${myTeam}`]: true});
+    myRole='host';
+    showScreen('lobby');buildLobbyTeams();
   }
-  startListening();
-  document.getElementById('screen-join').style.display='none';
-  document.getElementById('screen-game').style.display='block';
-  setupMyBadge();
-  buildBoard();
-  buildLegend();
+});
+
+/* ══ LOBBY ══ */
+function buildLobbyTeams(){
+  const el=document.getElementById('teams-config');
+  el.innerHTML='';
+  for(let t=1;t<=4;t++){
+    el.innerHTML+=`<div class="team-cfg">
+      <h3 style="color:${TC[t-1]}">${TN[t-1]}</h3>
+      <div class="radio-row">
+        <label><input type="radio" name="tm${t}" value="off" checked onchange="onTeamCfg(${t},'off')"><span>Désactivée</span></label>
+        <label><input type="radio" name="tm${t}" value="player" onchange="onTeamCfg(${t},'player')"><span>Joueur</span></label>
+        <label><input type="radio" name="tm${t}" value="computer" onchange="onTeamCfg(${t},'computer')"><span>Ordi</span></label>
+      </div>
+    </div>`;
+  }
+  document.getElementById('input-code').addEventListener('input',checkLobbyReady);
+}
+const teamCfg={};
+window.onTeamCfg=function(t,v){teamCfg[t]=v==='off'?null:v;checkLobbyReady();};
+function checkLobbyReady(){
+  const code=document.getElementById('input-code').value.trim();
+  const hasPlayer=Object.values(teamCfg).includes('player');
+  document.getElementById('btn-create').disabled=!(code.length>=3&&hasPlayer);
+}
+
+window.createGame=async function(){
+  const code=document.getElementById('input-code').value.trim().toUpperCase();
+  gameCode=code;gameRef=ref(db,`games/${code}`);
+  const state={
+    phase:'theme_select',themeSelectTurn:0,activeThemes:[],
+    currentTeam:getFirstActive(),
+    positions:{t1:200,t2:200,t3:200,t4:200},
+    fromages:{t1:[false,false,false,false,false,false],t2:[false,false,false,false,false,false],t3:[false,false,false,false,false,false],t4:[false,false,false,false,false,false]},
+    scores:{t1:0,t2:0,t3:0,t4:0},
+    dieValue:null,reachable:[],selectedCell:null,
+    question:null,answeredBy:null,chosenAnswer:null,timerEnd:null,winner:null,
+    teams:teamCfg,
+  };
+  await set(gameRef,state);
+  showLinks(code);
+  onValue(gameRef,snap=>{if(snap.exists()){localState=snap.val();if(myRole==='host')renderHost(localState);}});
 };
 
-async function initGame(){
-  const state={
-    phase:'waiting', // waiting|roll|move|question|result
-    currentTeam:1,
-    positions:{team1:200, team2:200, team3:200, team4:200},
-    fromages:{
-      team1:[false,false,false,false,false,false],
-      team2:[false,false,false,false,false,false],
-      team3:[false,false,false,false,false,false],
-      team4:[false,false,false,false,false,false],
-    },
-    dieValue:null,
-    reachableCells:[],
-    selectedCell:null,
-    currentQuestion:null,
-    timerEnd:null,
-    winner:null,
-    players:{[`team${myTeam}`]:true},
-    scores:{team1:0,team2:0,team3:0,team4:0},
-  };
-  await set(gameRef, state);
-}
+function getFirstActive(){for(let t=1;t<=4;t++)if(teamCfg[t])return t;return 1;}
+function getActiveOrder(teams){const o=[];for(let t=1;t<=4;t++)if(teams&&teams[t])o.push(t);return o;}
 
-function startListening(){
-  unsubscribe=onValue(gameRef,(snap)=>{
-    if(!snap.exists()) return;
-    localGameState=snap.val();
-    renderGame(localGameState);
-  });
-}
-
-// ═══════════════════════════════════════════════════════
-// PLATEAU SVG
-// ═══════════════════════════════════════════════════════
-function buildBoard(){
-  const svg=document.getElementById('board-svg');
-  svg.innerHTML='';
-
-  // Fond
-  const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
-  bg.setAttribute('cx',CX); bg.setAttribute('cy',CY); bg.setAttribute('r',R_EXT+20);
-  bg.setAttribute('fill','#0d1b2a'); bg.setAttribute('stroke','rgba(255,255,255,0.1)'); bg.setAttribute('stroke-width','1.5');
-  svg.appendChild(bg);
-
-  // Secteurs de fond (6 tranches colorées)
-  for(let s=0;s<6;s++){
-    const ang1=(s*60-90)*Math.PI/180;
-    const ang2=((s+1)*60-90)*Math.PI/180;
-    const r=R_EXT+18;
-    const x1=CX+r*Math.cos(ang1), y1=CY+r*Math.sin(ang1);
-    const x2=CX+r*Math.cos(ang2), y2=CY+r*Math.sin(ang2);
-    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
-    path.setAttribute('d',`M ${CX} ${CY} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`);
-    path.setAttribute('fill', THEMES[s].color+'22');
-    path.setAttribute('stroke','none');
-    svg.appendChild(path);
-
-    // Ligne de rayon
-    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-    const rp=polar(R_EXT+18,(s*60));
-    line.setAttribute('x1',CX); line.setAttribute('y1',CY);
-    line.setAttribute('x2',rp.x); line.setAttribute('y2',rp.y);
-    line.setAttribute('stroke','rgba(255,255,255,0.08)'); line.setAttribute('stroke-width','1');
-    svg.appendChild(line);
-  }
-
-  // Cases anneau extérieur (72 cases)
-  for(let i=0;i<72;i++){
-    drawCase(svg, i);
-  }
-
-  // Cases milieu de rayon (camembert) 100..105
-  for(let i=0;i<6;i++){
-    drawCase(svg, 100+i);
-  }
-
-  // Centre
-  drawCase(svg, 200);
-
-  // Labels thèmes
-  for(let s=0;s<6;s++){
-    const ang=s*60+30; // milieu du secteur
-    const p=polar(R_EXT+12, ang);
-    // on ne peut pas placer le texte à l'ext du plateau, on saute
+/* ══ LIENS ══ */
+function showLinks(code){
+  showScreen('links');
+  const base=location.origin+location.pathname;
+  const grid=document.getElementById('links-grid');
+  grid.innerHTML='';
+  for(let t=1;t<=4;t++){
+    if(!teamCfg[t])continue;
+    const url=`${base}?code=${code}&team=${t}`;
+    const card=document.createElement('div');
+    card.className='link-card';
+    card.style.borderColor=TC[t-1]+'66';
+    card.innerHTML=`<h3 style="color:${TC[t-1]}">${TN[t-1]}</h3>
+      <div class="link-url">${url}</div>
+      <button class="btn-outline" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('Lien copié !'))">📋 Copier</button>`;
+    grid.appendChild(card);
   }
 }
+window.goToGame=function(){showScreen('themes');renderHostThemes();};
 
-function drawCase(svg, id){
-  const pos=getCasePos(id);
-  let r=14, stroke='rgba(255,255,255,0.25)', fill='#1a2a3a', strokeW=1.5;
-  const theme=getCaseTheme(id);
-  const color=theme?theme.color:'#ffd700';
-
-  if(id===200){
-    // centre hexagonal
-    r=R_HUB;
-    const hex=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    const pts=[];
-    for(let i=0;i<6;i++){
-      const a=(i*60-30)*Math.PI/180;
-      pts.push(`${CX+r*Math.cos(a)},${CY+r*Math.sin(a)}`);
+/* ══ CONNEXION ÉQUIPE ══ */
+async function connectAsTeam(){
+  gameRef=ref(db,`games/${gameCode}`);
+  const card=document.getElementById('join-card');
+  // Attendre que le jeu existe
+  let tries=0;
+  async function tryConnect(){
+    const snap=await get(gameRef);
+    if(!snap.exists()){
+      tries++;
+      if(tries>30){card.innerHTML=`<p style="color:#f87171">Partie introuvable. Vérifiez le lien.</p>`;return;}
+      setTimeout(tryConnect,1000);return;
     }
-    hex.setAttribute('points',pts.join(' '));
-    hex.setAttribute('fill','#0d1b2a');
-    hex.setAttribute('stroke','rgba(255,215,0,0.6)'); hex.setAttribute('stroke-width','2');
-    hex.setAttribute('id','case-200');
-    svg.appendChild(hex);
-    // étoile centrale
-    const star=document.createElementNS('http://www.w3.org/2000/svg','text');
-    star.setAttribute('x',CX); star.setAttribute('y',CY+6);
-    star.setAttribute('text-anchor','middle'); star.setAttribute('font-size','32');
-    star.textContent='⭐';
-    svg.appendChild(star);
-    return;
+    localState=snap.val();
+    card.innerHTML=`
+      <div class="team-badge" style="background:${TC[myTeam-1]}33;border:3px solid ${TC[myTeam-1]};color:${TC[myTeam-1]}">${TN[myTeam-1]}</div>
+      <div class="join-status">Connecté en tant que <strong style="color:${TC[myTeam-1]}">${TN[myTeam-1]}</strong></div>
+      <div class="join-waiting"><div class="spinner"></div> En attente du démarrage...</div>`;
+    onValue(gameRef,snap=>{if(snap.exists()){localState=snap.val();renderTeam(localState);}});
   }
-
-  if(isCamembert(id)){
-    // case camembert — grande, colorée
-    r=20; fill=color; strokeW=3; stroke='#fff';
-    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-    circ.setAttribute('fill',fill+'cc'); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
-    circ.setAttribute('id',`case-${id}`);
-    circ.setAttribute('class','board-case camembert-case');
-    circ.setAttribute('data-id',id);
-    svg.appendChild(circ);
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+5);
-    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','16');
-    txt.textContent='🧀'; txt.setAttribute('pointer-events','none');
-    svg.appendChild(txt);
-    return;
-  }
-
-  if(isRejouer(id)){
-    r=14; fill='#1a1a2e'; stroke='#ffd700'; strokeW=2;
-    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-    circ.setAttribute('fill',fill); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
-    circ.setAttribute('id',`case-${id}`);
-    circ.setAttribute('class','board-case');
-    circ.setAttribute('data-id',id);
-    svg.appendChild(circ);
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+4);
-    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','11');
-    txt.setAttribute('fill','#ffd700'); txt.setAttribute('font-weight','bold');
-    txt.textContent='↺'; txt.setAttribute('pointer-events','none');
-    svg.appendChild(txt);
-    return;
-  }
-
-  if(isChoixLibre(id)){
-    r=14; fill='#1a1a2e'; stroke='#fff'; strokeW=2;
-    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-    circ.setAttribute('fill',fill); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
-    circ.setAttribute('id',`case-${id}`);
-    circ.setAttribute('class','board-case');
-    circ.setAttribute('data-id',id);
-    svg.appendChild(circ);
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+4);
-    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','10');
-    txt.setAttribute('fill','#fff');
-    txt.textContent='★'; txt.setAttribute('pointer-events','none');
-    svg.appendChild(txt);
-    return;
-  }
-
-  // Case normale
-  const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
-  circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
-  circ.setAttribute('fill',color+'55'); circ.setAttribute('stroke',color+'99'); circ.setAttribute('stroke-width',strokeW);
-  circ.setAttribute('id',`case-${id}`);
-  circ.setAttribute('class','board-case');
-  circ.setAttribute('data-id',id);
-  svg.appendChild(circ);
+  tryConnect();
 }
 
-function buildLegend(){
-  const leg=document.getElementById('legend');
-  leg.innerHTML='<div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Thèmes</div>';
-  THEMES.forEach(t=>{
-    leg.innerHTML+=`<div class="legend-item"><div class="legend-dot" style="background:${t.color}"></div><span>${t.emoji} ${t.label}</span></div>`;
-  });
-  leg.innerHTML+=`<div class="legend-item" style="margin-top:4px"><div class="legend-dot" style="background:#ffd700"></div><span>↺ Rejouer</span></div>`;
-  leg.innerHTML+=`<div class="legend-item"><div class="legend-dot" style="background:#fff"></div><span>★ Thème libre</span></div>`;
+/* ══ RENDU HÔTE ══ */
+function renderHost(state){
+  if(state.phase==='theme_select'){showScreen('themes');renderHostThemes();}
+  else{showScreen('game');renderGame(state);}
 }
 
-function setupMyBadge(){
-  document.getElementById('my-dot').style.background=TEAM_COLORS[myTeam-1];
-  document.getElementById('my-label').textContent=TEAM_NAMES[myTeam-1];
+/* ══ RENDU ÉQUIPE ══ */
+function renderTeam(state){
+  if(!state)return;
+  if(state.winner){showWinner(state.winner);return;}
+  if(state.phase==='theme_select'){showScreen('themes');renderTeamThemes(state);}
+  else{showScreen('game');renderGame(state);}
 }
 
-// ═══════════════════════════════════════════════════════
-// RENDU ÉTAT
-// ═══════════════════════════════════════════════════════
+/* ══ SÉLECTION THÈMES ══ */
+function renderHostThemes(){
+  if(!localState)return;
+  renderThemeScreen(localState,myRole==='host'?null:myTeam);
+}
+function renderTeamThemes(state){renderThemeScreen(state,myTeam);}
+
+function renderThemeScreen(state,viewerTeam){
+  const used=(state.activeThemes||[]).map(t=>t.id);
+  const order=getActiveOrder(state.teams||teamCfg);
+  const turn=state.themeSelectTurn||0;
+  const choosingTeam=turn<order.length?order[turn]:null;
+  const isMyTurn=viewerTeam&&choosingTeam===viewerTeam;
+  const isComputer=choosingTeam&&(state.teams||teamCfg)[choosingTeam]==='computer';
+
+  document.getElementById('ts-who').textContent=choosingTeam?TN[choosingTeam-1]:'—';
+  document.getElementById('ts-who').style.color=choosingTeam?TC[choosingTeam-1]:'#fff';
+  document.getElementById('ts-sub').textContent=`Tour ${turn+1}/${order.length} — choisissez votre thème`;
+
+  const grid=document.getElementById('themes-grid-pick');
+  const wait=document.getElementById('ts-waiting');
+  grid.style.display=isMyTurn?'grid':'none';
+  wait.style.display=isMyTurn?'none':'flex';
+  document.getElementById('ts-wait-text').textContent=
+    isComputer?`${TN[choosingTeam-1]} (ordinateur) choisit...`:
+    choosingTeam?`En attente de ${TN[choosingTeam-1]}...`:'Thèmes sélectionnés !';
+
+  if(isMyTurn){
+    grid.innerHTML='';
+    ALL_THEMES.forEach(th=>{
+      const btn=document.createElement('div');
+      btn.className='tpick'+(used.includes(th.id)?' used':'');
+      btn.style.background=th.color+'cc';
+      btn.innerHTML=`<span class="tpick-emoji">${th.emoji}</span><div class="tpick-name">${th.label}</div>`;
+      if(!used.includes(th.id))btn.addEventListener('click',()=>pickTheme(state,th));
+      grid.appendChild(btn);
+    });
+  }
+
+  // Auto ordi
+  if(isComputer&&myRole==='host'){
+    setTimeout(()=>{
+      if(!localState)return;
+      const u=(localState.activeThemes||[]).map(t=>t.id);
+      const avail=ALL_THEMES.filter(t=>!u.includes(t.id));
+      if(avail.length)pickTheme(localState,avail[Math.floor(Math.random()*avail.length)]);
+    },1200);
+  }
+}
+
+async function pickTheme(state,th){
+  const newThemes=[...(state.activeThemes||[]),th];
+  const newTurn=(state.themeSelectTurn||0)+1;
+  const order=getActiveOrder(state.teams||teamCfg);
+  if(newTurn>=order.length){
+    await update(gameRef,{activeThemes:newThemes,themeSelectTurn:newTurn,phase:'roll'});
+  } else {
+    await update(gameRef,{activeThemes:newThemes,themeSelectTurn:newTurn});
+  }
+}
+
+/* ══ JEU ══ */
 function renderGame(state){
-  if(!state) return;
-  if(state.winner){
-    showWinner(state.winner);
-    return;
-  }
+  if(state.winner){showWinner(state.winner);return;}
+  activeThemes=state.activeThemes||[];
+  const colors=activeThemes.map(t=>t.color);
+  const isMyTurn=myRole==='host'?false:(state.currentTeam===myTeam);
+  const ct=state.currentTeam||1;
 
-  const ct=state.currentTeam;
-  const isMyTurn=(ct===myTeam);
+  if(!boardBuilt){buildBoard(state);buildSidePanel(state);boardBuilt=true;}
 
   // Top bar
-  document.getElementById('turn-info').textContent=
-    `${TEAM_EMOJIS[ct-1]} ${TEAM_NAMES[ct-1]}` + (isMyTurn?' — Votre tour !':'');
-  document.getElementById('turn-info').style.color=TEAM_COLORS[ct-1];
+  document.getElementById('turn-info').textContent=TN[ct-1]+(isMyTurn?' — Votre tour !':'');
+  document.getElementById('turn-info').style.color=TC[ct-1];
+  const pLabel={roll:'Lancer le dé',move:'Choisir une case',question:'Question',result:'Résultat'};
+  document.getElementById('phase-info').textContent=pLabel[state.phase]||'';
 
-  const phaseLabels={
-    waiting:'En attente de joueurs...',
-    roll:'Lancer le dé',
-    move:'Choisir une case',
-    question:'Question en cours',
-    result:'Résultat',
-  };
-  document.getElementById('phase-info').textContent=phaseLabels[state.phase]||'';
-
-  // Timer
   renderTimer(state);
-
-  // Action zone
-  renderActionZone(state, isMyTurn);
-
-  // Question
-  renderQuestion(state, isMyTurn);
-
-  // Pions
+  renderAction(state,isMyTurn,colors);
+  renderQuestion(state,isMyTurn);
   renderPions(state);
-
-  // Cases surlignées
-  renderHighlight(state);
-
-  // Panel équipes
-  renderTeamsPanel(state);
+  renderHighlight(state,isMyTurn);
+  updateDisques(state);
 }
 
+/* ══ TIMER ══ */
 function renderTimer(state){
-  const timerEl=document.getElementById('timer-display');
-  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
-  if(!state.timerEnd || state.phase==='result' || state.phase==='waiting'){
-    timerEl.textContent='—'; timerEl.className='';
-    return;
-  }
+  if(timerInt){clearInterval(timerInt);timerInt=null;}
+  const bar=document.getElementById('timer-bar');
+  const num=document.getElementById('timer-num');
+  const max=state.phase==='move'?10:state.phase==='question'?30:0;
+  if(!state.timerEnd||!max){bar.style.width='100%';num.textContent='—';return;}
   function tick(){
-    const rem=Math.max(0, Math.ceil((state.timerEnd - Date.now())/1000));
-    timerEl.textContent=rem;
-    timerEl.className=rem<=5?'urgent':'';
-    if(rem<=0){
-      clearInterval(timerInterval); timerInterval=null;
-      timerEl.textContent='0';
-    }
+    const rem=Math.max(0,(state.timerEnd-Date.now())/1000);
+    const pct=Math.min(100,(rem/max)*100);
+    bar.style.width=pct+'%';
+    bar.style.background=pct>50?'#4ade80':pct>25?'#fbbf24':'#f87171';
+    num.textContent=Math.ceil(rem);
+    if(rem<=0){clearInterval(timerInt);timerInt=null;}
   }
-  tick();
-  timerInterval=setInterval(tick,500);
+  tick();timerInt=setInterval(tick,200);
 }
 
-function renderActionZone(state, isMyTurn){
+/* ══ ACTION ZONE ══ */
+function renderAction(state,isMyTurn,colors){
   const zone=document.getElementById('action-zone');
-  zone.innerHTML='';
-
-  if(state.phase==='waiting'){
-    zone.innerHTML=`<span class="action-msg">En attente des équipes... (${Object.keys(state.players||{}).length}/4)</span>
-    ${isMyTurn||myTeam===1?`<button class="btn-primary" style="max-width:220px" onclick="startGame()">Lancer la partie</button>`:''}`;
-    return;
-  }
+  document.getElementById('question-panel').classList.remove('vis');
 
   if(state.phase==='roll'){
     if(isMyTurn){
-      zone.innerHTML=`<div id="die-display">🎲</div>
-      <button id="btn-roll" onclick="rollDie()">Lancer le dé</button>`;
+      zone.innerHTML=`<button id="btn-roll" onclick="doRoll()">
+        <div class="die-icon">${dieSVG(1,72,colors)}</div>
+        <span class="die-label">Lancer !</span>
+      </button>
+      <span class="action-msg">C'est votre tour !<br><strong>Cliquez sur le dé pour jouer.</strong></span>`;
     } else {
-      zone.innerHTML=`<span class="action-msg">${TEAM_NAMES[state.currentTeam-1]} lance le dé...</span>`;
+      zone.innerHTML=`<div>${dieSVG(1,56,colors)}</div>
+        <span class="action-msg">Tour de <strong>${TN[(state.currentTeam||1)-1]}</strong><br>En attente du lancer...</span>`;
     }
     return;
   }
-
   if(state.phase==='move'){
-    const dieVal=state.dieValue;
-    zone.innerHTML=`<div id="die-display">${getDieFace(dieVal)}</div>
-    <span class="action-msg">${isMyTurn?'Cliquez sur une case surlignée pour vous déplacer':'En attente du déplacement...'}</span>`;
+    zone.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font-size:.7rem;color:rgba(255,255,255,.45);font-weight:700;text-transform:uppercase;letter-spacing:1px">Résultat</div>
+      <div>${dieSVG(state.dieValue||1,72,colors)}</div>
+    </div>
+    <span class="action-msg">${isMyTurn?`<strong>Cliquez sur une case dorée</strong><br>pour avancer (10s)`:
+      `<strong>${TN[(state.currentTeam||1)-1]}</strong> choisit sa case...`}</span>`;
     return;
   }
-
   if(state.phase==='question'||state.phase==='result'){
-    const dieVal=state.dieValue;
-    zone.innerHTML=`<div id="die-display" style="font-size:1.8rem">${getDieFace(dieVal)}</div>`;
-    return;
+    zone.innerHTML=`<div>${dieSVG(state.dieValue||1,56,colors)}</div>`;
+    document.getElementById('question-panel').classList.add('vis');
   }
 }
 
-function getDieFace(n){
-  return ['','⚀','⚁','⚂','⚃','⚄','⚅'][n]||'🎲';
-}
-
-function renderQuestion(state, isMyTurn){
-  const panel=document.getElementById('question-panel');
-  if(state.phase!=='question'&&state.phase!=='result'){
-    panel.classList.remove('visible');
-    return;
-  }
-  panel.classList.add('visible');
-  if(!state.currentQuestion) return;
-
-  const q=state.currentQuestion;
-  const theme=THEMES.find(t=>t.id===q.themeId);
-
-  const badge=document.getElementById('question-theme-badge');
-  badge.textContent=`${theme.emoji} ${theme.label}`;
-  badge.style.background=theme.color+'33';
-  badge.style.color=theme.color;
-  badge.style.border=`1px solid ${theme.color}55`;
-
-  document.getElementById('question-text').textContent=q.text;
-
-  const grid=document.getElementById('answers-grid');
-  grid.innerHTML='';
-  const letters=['A','B','C','D'];
-  q.opts.forEach((opt,i)=>{
-    const btn=document.createElement('button');
-    btn.className='answer-btn';
-    btn.textContent=`${letters[i]}. ${opt}`;
-    btn.disabled=!isMyTurn || state.phase==='result' || state.answeredBy!=null;
-
-    if(state.phase==='result'||state.answeredBy!=null){
-      if(i===q.ans) btn.classList.add('reveal-correct');
-      if(state.chosenAnswer===i && i!==q.ans) btn.classList.add('wrong');
-    }
-
-    btn.addEventListener('click',()=>{ if(isMyTurn && state.phase==='question') submitAnswer(i, q.ans); });
-    grid.appendChild(btn);
-  });
-
-  const res=document.getElementById('result-msg');
-  if(state.phase==='result'||state.answeredBy!=null){
-    res.style.display='block';
-    if(state.answeredBy==null){
-      res.className=''; res.textContent='⏱️ Temps écoulé ! Mauvaise réponse.';
-      res.style.background='rgba(230,57,70,0.2)'; res.style.color='#f87171';
-    } else if(state.chosenAnswer===q.ans){
-      res.className='win'; res.textContent='✅ Bonne réponse !';
-    } else {
-      res.className='lose'; res.textContent=`❌ Mauvaise réponse ! La bonne réponse était : ${letters[q.ans]}`;
-    }
-    if(state.nextTeamIn && isMyTurn){
-      // rien, le timer gère
-    }
-  } else {
-    res.style.display='none';
-  }
-}
-
-function renderPions(state){
-  // Supprimer anciens pions
-  document.querySelectorAll('.pion-marker').forEach(e=>e.remove());
-  const svg=document.getElementById('board-svg');
-  const positions=state.positions||{};
-  const offsets=[{dx:-8,dy:-8},{dx:8,dy:-8},{dx:-8,dy:8},{dx:8,dy:8}];
-  for(let t=1;t<=4;t++){
-    const posId=positions[`team${t}`]??200;
-    const p=getCasePos(posId);
-    const off=offsets[t-1];
-    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
-    g.setAttribute('class','pion pion-marker');
-    g.setAttribute('transform',`translate(${p.x+off.dx},${p.y+off.dy})`);
-    // cercle coloré
-    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx',0); c.setAttribute('cy',0); c.setAttribute('r',9);
-    c.setAttribute('fill',TEAM_COLORS[t-1]);
-    c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','1.5');
-    g.appendChild(c);
-    // numéro
-    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
-    txt.setAttribute('x',0); txt.setAttribute('y',4);
-    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','10');
-    txt.setAttribute('fill','#fff'); txt.setAttribute('font-weight','bold');
-    txt.textContent=t;
-    g.appendChild(txt);
-    svg.appendChild(g);
-  }
-}
-
-function renderHighlight(state){
-  // Reset toutes les cases
-  document.querySelectorAll('.board-case').forEach(el=>{
-    el.style.filter='';
-    el.style.cursor='default';
-    el.style.strokeWidth='';
-    el.onclick=null;
-  });
-  // Supprimer anciens glows
-  document.querySelectorAll('.reach-glow').forEach(e=>e.remove());
-
-  if(state.phase!=='move') return;
-  const reach=state.reachableCells||[];
-  const isMyTurn=state.currentTeam===myTeam;
-  if(!isMyTurn) return;
-
-  const svg=document.getElementById('board-svg');
-  reach.forEach(id=>{
-    const el=document.getElementById(`case-${id}`);
-    if(!el) return;
-    el.style.filter='brightness(1.8) drop-shadow(0 0 6px #ffd700)';
-    el.style.cursor='pointer';
-    el.onclick=()=>chooseCell(id);
-
-    // glow ring
-    const pos=getCasePos(id);
-    const glow=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    glow.setAttribute('cx',pos.x); glow.setAttribute('cy',pos.y); glow.setAttribute('r',id>=100?24:17);
-    glow.setAttribute('fill','none'); glow.setAttribute('stroke','#ffd700');
-    glow.setAttribute('stroke-width','2'); glow.setAttribute('opacity','0.5');
-    glow.setAttribute('class','reach-glow');
-    svg.appendChild(glow);
-  });
-}
-
-function renderTeamsPanel(state){
-  const list=document.getElementById('teams-list');
-  list.innerHTML='';
-  for(let t=1;t<=4;t++){
-    const fromages=state.fromages?.[`team${t}`]||[false,false,false,false,false,false];
-    const score=state.scores?.[`team${t}`]||0;
-    const active=state.currentTeam===t;
-    const div=document.createElement('div');
-    div.className='team-panel'+(active?' active-turn':'');
-    div.innerHTML=`
-      <div class="team-panel-header">
-        <div class="team-dot" style="background:${TEAM_COLORS[t-1]}"></div>
-        <div class="team-name-side">${TEAM_NAMES[t-1]}</div>
-        <div class="team-score">${score} pt${score>1?'s':''}</div>
-      </div>
-      <div class="fromages-grid">
-        ${THEMES.map((th,i)=>`
-          <div class="fromage-slot${fromages[i]?' earned':''}" style="${fromages[i]?`background:${th.color}33;border:2px solid ${th.color};`:`border-color:${th.color}44;`}" title="${th.label}">
-            ${fromages[i]?'🧀':''}
-          </div>
-        `).join('')}
-      </div>`;
-    list.appendChild(div);
-  }
-}
-
-// ═══════════════════════════════════════════════════════
-// ACTIONS JOUEUR
-// ═══════════════════════════════════════════════════════
-window.startGame=async function(){
-  await update(gameRef,{ phase:'roll', currentTeam:1 });
-};
-
-window.rollDie=async function(){
-  if(!localGameState||localGameState.currentTeam!==myTeam) return;
-  // Animation locale
-  const dieEl=document.getElementById('die-display');
-  if(dieEl){ dieEl.classList.add('rolling'); }
-  await new Promise(r=>setTimeout(r,600));
-  if(dieEl){ dieEl.classList.remove('rolling'); }
-
+window.doRoll=async function(){
+  if(!localState||localState.currentTeam!==myTeam)return;
+  const btn=document.getElementById('btn-roll');if(btn)btn.disabled=true;
+  const icon=document.querySelector('.die-icon');if(icon)icon.classList.add('rolling');
+  await new Promise(r=>setTimeout(r,560));
   const val=Math.floor(Math.random()*6)+1;
-  const pos=localGameState.positions[`team${myTeam}`]??200;
+  const pos=localState.positions?.[`t${myTeam}`]??200;
   const reach=getReachable(pos,val);
-
-  const timerEnd=Date.now()+10000; // 10s pour choisir
-  await update(gameRef,{
-    phase:'move',
-    dieValue:val,
-    reachableCells:reach,
-    selectedCell:null,
-    timerEnd,
-    currentQuestion:null,
-    answeredBy:null,
-    chosenAnswer:null,
-  });
-
-  // Timer serveur : si pas de choix dans 10s → case aléatoire
+  const timerEnd=Date.now()+10000;
+  await update(gameRef,{phase:'move',dieValue:val,reachable:reach,timerEnd,question:null,answeredBy:null,chosenAnswer:null});
+  // Fallback timer
   setTimeout(async()=>{
-    const snap=await get(gameRef);
-    const s=snap.val();
+    const snap=await get(gameRef);const s=snap.val();
     if(s&&s.phase==='move'&&s.currentTeam===myTeam){
-      // choisir aléatoirement
-      const r=s.reachableCells||[];
-      if(r.length>0){
-        const c=r[Math.floor(Math.random()*r.length)];
-        await chooseCell(c, true);
-      } else {
-        await nextTurn();
-      }
+      const r=s.reachable||[];
+      if(r.length>0)await doMove(r[Math.floor(Math.random()*r.length)]);
+      else await nextTurn();
     }
-  },10200);
+  },10600);
 };
 
-async function chooseCell(id, auto=false){
-  if(!localGameState||localGameState.currentTeam!==myTeam) return;
-  if(localGameState.phase!=='move') return;
-  const pos=id;
-
-  // Déterminer thème
+async function doMove(id){
+  if(!localState||localState.currentTeam!==myTeam||localState.phase!=='move')return;
+  const pos={...localState.positions,[`t${myTeam}`]:id};
+  if(id===200||isRejouer(id)){
+    await update(gameRef,{phase:'roll',positions:pos,reachable:[],timerEnd:null});
+    toast(id===200?'⭐ Centre — Rejouer !':'↺ Rejouer !');return;
+  }
   let themeId=null;
   if(isChoixLibre(id)){
-    // thème libre : l'équipe choisit (TODO: picker) — on prend le premier non acquis
-    const fromages=localGameState.fromages[`team${myTeam}`];
-    const idx=fromages.findIndex(v=>!v);
-    themeId=idx>=0?THEMES[idx].id:THEMES[0].id;
-  } else if(id===200){
-    // centre : rejouer
-    await update(gameRef,{
-      phase:'roll',
-      positions:{...localGameState.positions,[`team${myTeam}`]:id},
-      reachableCells:[],
-      timerEnd:null,
-    });
-    return;
+    const from=localState.fromages?.[`t${myTeam}`]||[];
+    const idx=from.findIndex(v=>!v);
+    themeId=idx>=0?(activeThemes[idx]?.id||activeThemes[0].id):activeThemes[0].id;
+    toast('★ Thème libre !');
   } else {
-    const theme=getCaseTheme(id);
-    themeId=theme?theme.id:null;
+    const ti=caseThemeIdx(id);
+    themeId=activeThemes[ti]?.id||activeThemes[0].id;
   }
-
-  // Case rejouer
-  if(isRejouer(id)){
-    await update(gameRef,{
-      phase:'roll',
-      positions:{...localGameState.positions,[`team${myTeam}`]:id},
-      reachableCells:[],
-      timerEnd:null,
-    });
-    showToast('↺ Rejouer !');
-    return;
-  }
-
-  // Générer question
-  const q=getQuestion(themeId);
-  const question={
-    text:q.q,
-    opts:q.opts,
-    ans:q.ans,
-    themeId,
-    isCamembert:isCamembert(id),
-    cellId:id,
-  };
-
+  const q=getQ(themeId);
   const timerEnd=Date.now()+30000;
   await update(gameRef,{
-    phase:'question',
-    positions:{...localGameState.positions,[`team${myTeam}`]:id},
-    reachableCells:[],
-    selectedCell:id,
-    currentQuestion:question,
-    answeredBy:null,
-    chosenAnswer:null,
-    timerEnd,
+    phase:'question',positions:pos,reachable:[],selectedCell:id,
+    question:{text:q.q,opts:q.opts,ans:q.ans,themeId,isCamembert:isCamembert(id),cellId:id},
+    answeredBy:null,chosenAnswer:null,timerEnd,
   });
-
-  // Timer question : 30s
   setTimeout(async()=>{
-    const snap=await get(gameRef);
-    const s=snap.val();
-    if(s&&s.phase==='question'&&s.currentTeam===myTeam&&s.answeredBy==null){
-      await handleAnswerResult(s, null, false);
-    }
-  },30500);
+    const snap=await get(gameRef);const s=snap.val();
+    if(s&&s.phase==='question'&&s.currentTeam===myTeam&&s.answeredBy==null)
+      await handleResult(s,null,false);
+  },30600);
 }
 
-async function submitAnswer(chosen, correct){
-  if(!localGameState||localGameState.currentTeam!==myTeam) return;
-  if(localGameState.answeredBy!=null) return;
-  const isCorrect=chosen===correct;
-  await update(gameRef,{
-    answeredBy:`team${myTeam}`,
-    chosenAnswer:chosen,
-    phase:'result',
-    timerEnd:null,
+/* ══ QUESTION ══ */
+function renderQuestion(state,isMyTurn){
+  if(state.phase!=='question'&&state.phase!=='result'){document.getElementById('question-panel').classList.remove('vis');return;}
+  const q=state.question;if(!q)return;
+  const th=activeThemes.find(t=>t.id===q.themeId)||activeThemes[0]||{color:'#888',emoji:'❓',label:'Thème'};
+  const badge=document.getElementById('q-badge');
+  badge.textContent=`${th.emoji} ${th.label}`;
+  badge.style.cssText=`background:${th.color}33;color:${th.color};border:1px solid ${th.color}55;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;align-self:flex-start;`;
+  document.getElementById('q-text').textContent=q.text;
+  const grid=document.getElementById('q-grid');grid.innerHTML='';
+  const L=['A','B','C','D'];
+  const done=state.answeredBy!=null||state.phase==='result';
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='ans-btn';btn.textContent=`${L[i]}. ${opt}`;
+    btn.disabled=!isMyTurn||done;
+    if(done){
+      if(i===q.ans)btn.classList.add('reveal');
+      if(state.chosenAnswer===i&&i!==q.ans)btn.classList.add('wrong');
+    }
+    btn.addEventListener('click',()=>{if(isMyTurn&&!done)submitAnswer(state,i);});
+    grid.appendChild(btn);
   });
-  await handleAnswerResult(localGameState, chosen, isCorrect);
+  const res=document.getElementById('q-result');
+  if(done){
+    if(state.answeredBy==null){res.className='lose';res.textContent='⏱️ Temps écoulé !';}
+    else if(state.chosenAnswer===q.ans){res.className='win';res.textContent=`✅ Bonne réponse !${q.isCamembert?' 🧀 Fromage !':''}`;}
+    else{res.className='lose';res.textContent=`❌ Mauvaise — bonne réponse : ${L[q.ans]}`;}
+  } else {res.className='';res.style.display='none';}
 }
 
-async function handleAnswerResult(state, chosen, isCorrect){
-  const ct=state.currentTeam;
-  const q=state.currentQuestion;
-  let updates={phase:'result', timerEnd:null};
+async function submitAnswer(state,chosen){
+  if(state.answeredBy!=null)return;
+  const ok=chosen===state.question.ans;
+  await update(gameRef,{answeredBy:`t${myTeam}`,chosenAnswer:chosen,phase:'result',timerEnd:null});
+  await handleResult(state,chosen,ok);
+}
 
-  if(isCorrect){
-    // Bonne réponse
-    updates[`scores/team${ct}`]=(state.scores?.[`team${ct}`]||0)+1;
-    if(q&&q.isCamembert){
-      const idx=THEMES.findIndex(t=>t.id===q.themeId);
-      if(idx>=0){
-        updates[`fromages/team${ct}/${idx}`]=true;
-      }
+async function handleResult(state,chosen,ok){
+  const ct=state.currentTeam;const q=state.question;
+  const upd={phase:'result',timerEnd:null};
+  if(ok){
+    upd[`scores/t${ct}`]=(state.scores?.[`t${ct}`]||0)+1;
+    if(q?.isCamembert){
+      const idx=activeThemes.findIndex(t=>t.id===q.themeId);
+      if(idx>=0)upd[`fromages/t${ct}/${idx}`]=true;
     }
-    await update(gameRef,updates);
-    // Vérifier victoire
-    const snap=await get(gameRef);
-    const s=snap.val();
-    const fromages=s.fromages[`team${ct}`];
-    if(fromages.every(v=>v)){
-      await update(gameRef,{winner:ct, phase:'finished'});
-      return;
-    }
-    // Rejoue
-    showToast('✅ Bonne réponse ! Vous rejouez !');
-    setTimeout(async()=>{
-      await update(gameRef,{phase:'roll',timerEnd:null,currentQuestion:null,answeredBy:null,chosenAnswer:null});
-    },3000);
-  } else {
-    await update(gameRef,{...updates, answeredBy: state.answeredBy??null});
-    showToast('❌ Mauvaise réponse...');
-    setTimeout(async()=>{
-      await nextTurn();
-    },3000);
   }
+  await update(gameRef,upd);
+  if(ok&&q?.isCamembert){
+    const snap=await get(gameRef);const s=snap.val();
+    if(s.fromages?.[`t${ct}`]?.every(v=>v)){await update(gameRef,{winner:ct,phase:'finished'});return;}
+  }
+  if(ok){toast('✅ Bonne réponse — vous rejouez !');setTimeout(async()=>{await update(gameRef,{phase:'roll',timerEnd:null,question:null,answeredBy:null,chosenAnswer:null});},3200);}
+  else{toast('❌ Mauvaise réponse...');setTimeout(async()=>{await nextTurn();},3200);}
 }
 
 async function nextTurn(){
-  const snap=await get(gameRef);
-  const s=snap.val();
-  if(!s) return;
-  const next=(s.currentTeam%4)+1;
-  await update(gameRef,{
-    phase:'roll',
-    currentTeam:next,
-    dieValue:null,
-    reachableCells:[],
-    selectedCell:null,
-    currentQuestion:null,
-    answeredBy:null,
-    chosenAnswer:null,
-    timerEnd:null,
+  const snap=await get(gameRef);const s=snap.val();if(!s)return;
+  const order=getActiveOrder(s.teams||teamCfg);
+  const idx=order.indexOf(s.currentTeam);const next=order[(idx+1)%order.length];
+  await update(gameRef,{phase:'roll',currentTeam:next,dieValue:null,reachable:[],selectedCell:null,question:null,answeredBy:null,chosenAnswer:null,timerEnd:null});
+}
+
+/* ══ PLATEAU SVG ══ */
+function mkSVG(t){return document.createElementNS('http://www.w3.org/2000/svg',t);}
+function buildBoard(state){
+  const svg=document.getElementById('board-svg');svg.innerHTML='';
+  const themes=state.activeThemes||[];
+
+  // Fond
+  const bg=mkSVG('circle');bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',300);
+  bg.setAttribute('fill','#1a3a5c');bg.setAttribute('stroke','#0f2540');bg.setAttribute('stroke-width','8');svg.appendChild(bg);
+
+  // Secteurs fond
+  for(let s=0;s<6;s++){
+    const th=themes[s];const color=(th?th.color:'#888')+'22';
+    const a1=rad2(s*60-90),a2=rad2((s+1)*60-90),r=R_OUT+2;
+    const p=mkSVG('path');
+    p.setAttribute('d',`M ${CX} ${CY} L ${CX+r*Math.cos(a1)} ${CY+r*Math.sin(a1)} A ${r} ${r} 0 0 1 ${CX+r*Math.cos(a2)} ${CY+r*Math.sin(a2)} Z`);
+    p.setAttribute('fill',color);svg.appendChild(p);
+  }
+
+  // Rayons larges
+  for(let s=0;s<6;s++){
+    const th=themes[s];const color=th?th.color:'#555';
+    const ang=s*60,w=38;
+    const p=polar((R_HUB+R_MID)/2,ang);
+    const rect=mkSVG('rect');
+    rect.setAttribute('x',p.x-w/2);rect.setAttribute('y',p.y-(R_MID-R_HUB)/2);
+    rect.setAttribute('width',w);rect.setAttribute('height',R_MID-R_HUB);
+    rect.setAttribute('fill',color);rect.setAttribute('transform',`rotate(${ang},${CX},${CY})`);
+    svg.appendChild(rect);
+  }
+
+  // Cases ext (54)
+  for(let i=0;i<54;i++)drawExtCase(svg,i,themes);
+  // Camemberts
+  for(let i=0;i<6;i++)drawCamembertCase(svg,100+i,themes);
+  // Centre
+  drawCentre(svg);
+}
+
+function drawExtCase(svg,id,themes){
+  const pos=casePos(id);const size=27;
+  const ti=caseThemeIdx(id);const th=themes[ti];const color=th?th.color:'#888';
+  const g=mkSVG('g');g.setAttribute('id',`case-${id}`);g.setAttribute('class','board-case');g.setAttribute('data-id',id);
+  const rect=mkSVG('rect');
+  rect.setAttribute('x',pos.x-size/2);rect.setAttribute('y',pos.y-size/2);
+  rect.setAttribute('width',size);rect.setAttribute('height',size);rect.setAttribute('rx','4');
+  if(isRejouer(id)){
+    rect.setAttribute('fill','#0f2540');rect.setAttribute('stroke','#ffd700');rect.setAttribute('stroke-width','2.5');
+    g.appendChild(rect);
+    const t=mkSVG('text');t.setAttribute('x',pos.x);t.setAttribute('y',pos.y+5);
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-size','14');t.setAttribute('fill','#ffd700');t.setAttribute('font-weight','bold');
+    t.textContent='↺';g.appendChild(t);
+  } else if(isChoixLibre(id)){
+    rect.setAttribute('fill','#fff');rect.setAttribute('stroke','#bbb');rect.setAttribute('stroke-width','1.5');
+    g.appendChild(rect);
+    const t=mkSVG('text');t.setAttribute('x',pos.x);t.setAttribute('y',pos.y+5);
+    t.setAttribute('text-anchor','middle');t.setAttribute('font-size','12');t.setAttribute('fill','#333');
+    t.textContent='★';g.appendChild(t);
+  } else {
+    const bg=isBeige(id)?'#d4b896':color+'cc';const st=isBeige(id)?'#c9a87a':color;
+    rect.setAttribute('fill',bg);rect.setAttribute('stroke',st);rect.setAttribute('stroke-width','1.5');
+    g.appendChild(rect);
+  }
+  svg.appendChild(g);
+}
+
+function drawCamembertCase(svg,id,themes){
+  const pos=casePos(id);const ti=id-100;const th=themes[ti];const color=th?th.color:'#888';
+  const ang=ti*60;const size=26;
+  const g=mkSVG('g');g.setAttribute('id',`case-${id}`);g.setAttribute('class','board-case camembert-case');g.setAttribute('data-id',id);
+  const pts=`${pos.x},${pos.y-size} ${pos.x+size*.75},${pos.y+size*.5} ${pos.x-size*.75},${pos.y+size*.5}`;
+  const tri=mkSVG('polygon');
+  tri.setAttribute('points',pts);tri.setAttribute('fill',color);tri.setAttribute('stroke','#fff');tri.setAttribute('stroke-width','2.5');
+  tri.setAttribute('transform',`rotate(${ang+180},${pos.x},${pos.y})`);
+  g.appendChild(tri);svg.appendChild(g);
+}
+
+function drawCentre(svg){
+  const bg=mkSVG('circle');bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',R_HUB+4);
+  bg.setAttribute('fill','#0f2540');bg.setAttribute('stroke','rgba(255,215,0,.5)');bg.setAttribute('stroke-width','3');svg.appendChild(bg);
+  const cols=['#e63946','#f4a261','#2a9d8f','#8338ec','#f4d35e','#e76f51'];
+  for(let i=0;i<6;i++){
+    const a1=rad2(i*60),a2=rad2((i+1)*60),r=R_HUB-2;
+    const p=mkSVG('path');
+    p.setAttribute('d',`M ${CX} ${CY} L ${CX+r*Math.cos(a1)} ${CY+r*Math.sin(a1)} A ${r} ${r} 0 0 1 ${CX+r*Math.cos(a2)} ${CY+r*Math.sin(a2)} Z`);
+    p.setAttribute('fill',cols[i]);svg.appendChild(p);
+  }
+  const ctr=mkSVG('circle');ctr.setAttribute('cx',CX);ctr.setAttribute('cy',CY);ctr.setAttribute('r',18);
+  ctr.setAttribute('fill','#fff');ctr.setAttribute('stroke','#ccc');ctr.setAttribute('stroke-width','1');svg.appendChild(ctr);
+  [[0,-6],[-6,-6],[6,-6],[-6,6],[0,6],[6,6]].forEach(([dx,dy])=>{
+    const d=mkSVG('circle');d.setAttribute('cx',CX+dx);d.setAttribute('cy',CY+dy);d.setAttribute('r',2.5);d.setAttribute('fill','#222');svg.appendChild(d);
   });
 }
 
-window.resetGame=async function(){
-  if(!gameRef) return;
-  document.getElementById('winner-overlay').classList.remove('visible');
-  await initGame();
-  await update(gameRef,{phase:'roll'});
-};
+/* ══ SIDE PANEL ══ */
+function buildSidePanel(state){
+  const themes=state.activeThemes||[];
+  const leg=document.getElementById('theme-legend');leg.innerHTML='';
+  themes.forEach(th=>{
+    leg.innerHTML+=`<div class="theme-leg-item" style="background:${th.color}18;border:1px solid ${th.color}33">
+      <div class="tli-dot" style="background:${th.color}"></div>
+      <span style="font-size:1rem">${th.emoji}</span>
+      <span class="tli-name">${th.label}</span></div>`;
+  });
+  const grid=document.getElementById('disques-grid');grid.innerHTML='';
+  const order=getActiveOrder(state.teams||teamCfg);
+  order.forEach(t=>{
+    const wrap=document.createElement('div');wrap.className='disque-wrap';wrap.id=`dw-${t}`;
+    wrap.innerHTML=`<div class="disque-name" style="color:${TC[t-1]}">${TN[t-1]}</div>
+      <svg id="disque-${t}" width="110" height="110" viewBox="0 0 110 110"></svg>`;
+    grid.appendChild(wrap);
+    buildDisque(t,state.fromages?.[`t${t}`]||[false,false,false,false,false,false],themes);
+  });
+}
 
-// ═══════════════════════════════════════════════════════
-// UTILITAIRES
-// ═══════════════════════════════════════════════════════
+function buildDisque(t,fromages,themes){
+  const svg=document.getElementById(`disque-${t}`);if(!svg)return;
+  svg.innerHTML='';const cx=55,cy=55,r=50;
+  const bgc=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  bgc.setAttribute('cx',cx);bgc.setAttribute('cy',cy);bgc.setAttribute('r',r);
+  bgc.setAttribute('fill','#0f2540');bgc.setAttribute('stroke',TC[t-1]);bgc.setAttribute('stroke-width','2');
+  svg.appendChild(bgc);
+  for(let i=0;i<6;i++){
+    const a1=rad2(i*60-90),a2=rad2((i+1)*60-90),rr=r-2;
+    const earned=fromages[i];const color=themes[i]?themes[i].color:'#333';
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M ${cx} ${cy} L ${cx+rr*Math.cos(a1)} ${cy+rr*Math.sin(a1)} A ${rr} ${rr} 0 0 1 ${cx+rr*Math.cos(a2)} ${cy+rr*Math.sin(a2)} Z`);
+    path.setAttribute('fill',earned?color:'rgba(255,255,255,0.04)');
+    path.setAttribute('stroke','rgba(255,255,255,0.12)');path.setAttribute('stroke-width','1');
+    svg.appendChild(path);
+  }
+  const ctr=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  ctr.setAttribute('cx',cx);ctr.setAttribute('cy',cy);ctr.setAttribute('r',12);
+  ctr.setAttribute('fill',TC[t-1]);svg.appendChild(ctr);
+  const num=document.createElementNS('http://www.w3.org/2000/svg','text');
+  num.setAttribute('x',cx);num.setAttribute('y',cy+4);num.setAttribute('text-anchor','middle');
+  num.setAttribute('font-size','11');num.setAttribute('fill','#fff');num.setAttribute('font-weight','bold');
+  num.textContent=t;svg.appendChild(num);
+}
+
+function updateDisques(state){
+  const themes=state.activeThemes||[];
+  const order=getActiveOrder(state.teams||teamCfg);
+  order.forEach(t=>buildDisque(t,state.fromages?.[`t${t}`]||[false,false,false,false,false,false],themes));
+}
+
+/* ══ PIONS & HIGHLIGHT ══ */
+function renderPions(state){
+  document.querySelectorAll('.pion-g').forEach(e=>e.remove());
+  const svg=document.getElementById('board-svg');
+  const positions=state.positions||{};
+  const order=getActiveOrder(state.teams||teamCfg);
+  const offsets=[{dx:-9,dy:-9},{dx:9,dy:-9},{dx:-9,dy:9},{dx:9,dy:9}];
+  for(let t=1;t<=4;t++){
+    if(!order.includes(t))continue;
+    const posId=positions[`t${t}`]??200;const p=casePos(posId);const off=offsets[t-1];
+    const g=mkSVG('g');g.setAttribute('class','pion-g');g.setAttribute('transform',`translate(${p.x+off.dx},${p.y+off.dy})`);
+    const c=mkSVG('circle');c.setAttribute('cx',0);c.setAttribute('cy',0);c.setAttribute('r',10);
+    c.setAttribute('fill',TC[t-1]);c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','2');g.appendChild(c);
+    const tx=mkSVG('text');tx.setAttribute('x',0);tx.setAttribute('y',4);tx.setAttribute('text-anchor','middle');
+    tx.setAttribute('font-size','10');tx.setAttribute('fill','#fff');tx.setAttribute('font-weight','bold');
+    tx.textContent=t;g.appendChild(tx);svg.appendChild(g);
+  }
+}
+
+function renderHighlight(state,isMyTurn){
+  document.querySelectorAll('.reach-ring').forEach(e=>e.remove());
+  document.querySelectorAll('.board-case').forEach(el=>{el.style.filter='';el.style.cursor='default';el.onclick=null;});
+  if(state.phase!=='move'||!isMyTurn)return;
+  const reach=state.reachable||[];const svg=document.getElementById('board-svg');
+  reach.forEach(id=>{
+    const el=document.getElementById(`case-${id}`);
+    if(el){el.style.filter='brightness(2) drop-shadow(0 0 8px gold)';el.style.cursor='pointer';el.onclick=()=>doMove(id);}
+    const pos=casePos(id);
+    const ring=mkSVG('circle');
+    ring.setAttribute('cx',pos.x);ring.setAttribute('cy',pos.y);ring.setAttribute('r',isCamembert(id)?32:19);
+    ring.setAttribute('fill','none');ring.setAttribute('stroke','#ffd700');ring.setAttribute('stroke-width','2.5');
+    ring.setAttribute('opacity','0.75');ring.setAttribute('class','reach-ring');
+    svg.appendChild(ring);
+  });
+}
+
+/* ══ WINNER ══ */
 function showWinner(team){
-  const ov=document.getElementById('winner-overlay');
-  ov.classList.add('visible');
-  document.getElementById('winner-title').textContent=`${TEAM_EMOJIS[team-1]} ${TEAM_NAMES[team-1]} gagne !`;
-  document.getElementById('winner-sub').textContent='Tous les fromages collectés ! 🧀🧀🧀🧀🧀🧀';
+  document.getElementById('winner-overlay').classList.add('vis');
+  document.getElementById('winner-h1').style.color=TC[team-1];
+  document.getElementById('winner-h1').textContent=`${TN[team-1]} gagne !`;
 }
 
-let toastTimeout=null;
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  if(toastTimeout) clearTimeout(toastTimeout);
-  toastTimeout=setTimeout(()=>t.classList.remove('show'),2500);
+/* ══ UTILS ══ */
+function showScreen(s){
+  ['lobby','links','join','themes','game'].forEach(id=>{
+    const el=document.getElementById(`screen-${id}`);
+    if(el)el.style.display=el.id===`screen-${s}`?(id==='game'?'block':'flex'):'none';
+  });
 }
-
-// Expose pour debug
-window._db=db; window._gameRef=gameRef;
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);
+}
+window.toast=toast;
 </script>
 </body>
 </html>
