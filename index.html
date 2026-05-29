@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trivial Poursuite Bac Pro</title>
+<style>
+  :root {
+    --fr: #0055A4; --hg: #E8A000; --ms: #009B48; --ps: #E63946;
+    --eg: #7B2D8B; --an: #F4A261; --or: #fff;
+    --bg: #1a1a2e; --card: #16213e; --text: #eaeaea; --muted: #888;
+    --border: rgba(255,255,255,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  /* ÉCRAN ACCUEIL */
+  #screen-join {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; gap: 20px; padding: 40px;
+  }
+  #screen-join h1 { font-size: 2.2rem; font-weight: 700; text-align: center; letter-spacing: 1px; }
+  #screen-join h1 span { color: #ffd700; }
+  .join-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 16px;
+  }
+  .join-card label { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .join-card input, .join-card select {
+    background: rgba(255,255,255,0.07); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-size: 1.1rem; padding: 12px 14px; width: 100%;
+  }
+  .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .team-btn {
+    padding: 14px; border-radius: 10px; border: 2px solid transparent;
+    font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all .2s;
+    background: rgba(255,255,255,0.07); color: var(--text);
+  }
+  .team-btn:hover { filter: brightness(1.2); }
+  .team-btn.selected { border-color: #fff; background: rgba(255,255,255,0.18); }
+  .team-btn[data-team="1"] { border-left: 4px solid var(--fr); }
+  .team-btn[data-team="2"] { border-left: 4px solid var(--hg); }
+  .team-btn[data-team="3"] { border-left: 4px solid var(--ms); }
+  .team-btn[data-team="4"] { border-left: 4px solid var(--ps); }
+  .btn-primary {
+    background: #ffd700; color: #111; border: none; border-radius: 10px;
+    padding: 14px; font-size: 1.05rem; font-weight: 700; cursor: pointer;
+    transition: all .2s; width: 100%;
+  }
+  .btn-primary:hover { background: #ffe340; transform: translateY(-1px); }
+  .btn-primary:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+
+  /* ÉCRAN JEU */
+  #screen-game { display: none; height: 100vh; overflow: hidden; }
+  #game-layout { display: grid; grid-template-columns: 1fr 280px; height: 100vh; }
+
+  /* ZONE PRINCIPALE */
+  #game-main {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 12px; gap: 8px; overflow: hidden; position: relative;
+  }
+
+  /* BARRE DU HAUT */
+  #top-bar {
+    width: 100%; display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 10px 18px; gap: 12px;
+  }
+  #turn-info { font-size: 1rem; font-weight: 600; }
+  #phase-info { font-size: 0.85rem; color: var(--muted); }
+  #timer-display {
+    font-size: 1.8rem; font-weight: 700; color: #ffd700;
+    min-width: 48px; text-align: center; font-variant-numeric: tabular-nums;
+  }
+  #timer-display.urgent { color: #e63946; animation: pulse .5s infinite alternate; }
+  @keyframes pulse { to { transform: scale(1.15); } }
+
+  /* PLATEAU SVG */
+  #board-wrap {
+    flex: 1; width: 100%; display: flex; align-items: center; justify-content: center;
+    min-height: 0;
+  }
+  #board-svg { max-width: 100%; max-height: 100%; }
+
+  /* ZONE ACTION */
+  #action-zone {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; min-height: 80px;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+  }
+  #btn-roll {
+    background: linear-gradient(135deg, #ffd700, #ff9500);
+    color: #111; border: none; border-radius: 12px; padding: 14px 32px;
+    font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  }
+  #btn-roll:hover { transform: scale(1.05); }
+  #btn-roll:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+  #die-display {
+    font-size: 2.8rem; transition: transform .1s;
+    user-select: none; min-width: 50px; text-align: center;
+  }
+  #die-display.rolling { animation: rollDie .08s infinite; }
+  @keyframes rollDie { 0%{transform:rotate(-8deg)scale(1.1)} 50%{transform:rotate(8deg)scale(0.95)} }
+  .action-msg { font-size: 0.95rem; color: var(--muted); text-align: center; }
+
+  /* QUESTION */
+  #question-panel {
+    display: none; width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px; flex-direction: column; gap: 12px;
+  }
+  #question-panel.visible { display: flex; }
+  #question-theme-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    align-self: flex-start;
+  }
+  #question-text { font-size: 1.05rem; font-weight: 600; line-height: 1.5; }
+  #answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .answer-btn {
+    background: rgba(255,255,255,0.07); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; color: var(--text);
+    font-size: 0.95rem; cursor: pointer; text-align: left; transition: all .2s;
+    line-height: 1.4;
+  }
+  .answer-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+  .answer-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+  .answer-btn.correct { background: rgba(0,155,72,0.3); border-color: #009B48; }
+  .answer-btn.wrong { background: rgba(230,57,70,0.3); border-color: #E63946; }
+  .answer-btn.reveal-correct { background: rgba(0,155,72,0.3); border-color: #009B48; }
+  #result-msg {
+    font-size: 1.1rem; font-weight: 700; text-align: center; padding: 8px;
+    border-radius: 8px; display: none;
+  }
+  #result-msg.win { background: rgba(0,155,72,0.2); color: #4ade80; }
+  #result-msg.lose { background: rgba(230,57,70,0.2); color: #f87171; }
+
+  /* PANNEAU LATÉRAL */
+  #side-panel {
+    background: var(--card); border-left: 1px solid var(--border);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    overflow-y: auto;
+  }
+  #side-panel h2 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .team-panel {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; transition: all .3s;
+  }
+  .team-panel.active-turn { border-color: #ffd700; box-shadow: 0 0 12px rgba(255,215,0,0.2); }
+  .team-panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .team-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .team-name-side { font-size: 0.9rem; font-weight: 600; }
+  .team-score { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+  .fromages-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
+  .fromage-slot {
+    aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.3);
+    transition: all .4s; font-size: 1.2rem; background: rgba(255,255,255,0.05);
+  }
+  .fromage-slot.earned { border-width: 0; background: none; }
+
+  /* THEMES LÉGENDE */
+  .legend { display: flex; flex-direction: column; gap: 5px; margin-top: auto; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* MY TEAM BADGE */
+  #my-team-badge {
+    position: fixed; top: 14px; right: 300px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px;
+    font-size: 0.82rem; display: flex; align-items: center; gap: 6px; z-index: 10;
+  }
+
+  /* WINNER */
+  #winner-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+  }
+  #winner-overlay.visible { display: flex; }
+  #winner-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+    padding: 48px; text-align: center; max-width: 400px;
+  }
+  #winner-box h1 { font-size: 2.5rem; margin-bottom: 8px; }
+  #winner-box p { color: var(--muted); font-size: 1.1rem; }
+  .confetti { font-size: 3rem; }
+
+  /* TOAST */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
+    font-size: 0.9rem; z-index: 200; opacity: 0; transition: opacity .3s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; }
+
+  /* PION */
+  .pion { transition: all .5s cubic-bezier(.34,1.56,.64,1); }
+
+  @media (max-width: 900px) {
+    #game-layout { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    #side-panel { border-left: none; border-top: 1px solid var(--border); max-height: 200px; flex-direction: row; flex-wrap: wrap; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN ACCUEIL -->
+<div id="screen-join">
+  <h1>🎓 Trivial Poursuite <span>Bac Pro</span></h1>
+  <div class="join-card">
+    <div>
+      <label>Code de partie</label>
+      <input id="input-code" type="text" placeholder="Ex: MATHS2024" maxlength="12" style="margin-top:6px; text-transform:uppercase">
+    </div>
+    <div>
+      <label style="display:block;margin-bottom:8px">Choisir son équipe</label>
+      <div class="team-grid">
+        <button class="team-btn" data-team="1" onclick="selectTeam(1)">🔵 Équipe 1</button>
+        <button class="team-btn" data-team="2" onclick="selectTeam(2)">🟡 Équipe 2</button>
+        <button class="team-btn" data-team="3" onclick="selectTeam(3)">🟢 Équipe 3</button>
+        <button class="team-btn" data-team="4" onclick="selectTeam(4)">🔴 Équipe 4</button>
+      </div>
+    </div>
+    <button class="btn-primary" id="btn-join" onclick="joinGame()" disabled>Rejoindre la partie</button>
+  </div>
+  <p style="color:var(--muted);font-size:0.82rem">Tous les appareils entrent le même code de partie</p>
+</div>
+
+<!-- ÉCRAN JEU -->
+<div id="screen-game">
+  <div id="my-team-badge">
+    <span id="my-dot" style="width:10px;height:10px;border-radius:50%;display:inline-block"></span>
+    <span id="my-label"></span>
+  </div>
+  <div id="game-layout">
+    <!-- ZONE PRINCIPALE -->
+    <div id="game-main">
+      <div id="top-bar">
+        <div>
+          <div id="turn-info">Chargement...</div>
+          <div id="phase-info"></div>
+        </div>
+        <div id="timer-display">—</div>
+      </div>
+      <div id="board-wrap">
+        <svg id="board-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div id="action-zone">
+        <span class="action-msg" id="action-msg">En attente...</span>
+      </div>
+      <div id="question-panel">
+        <div id="question-theme-badge"></div>
+        <div id="question-text"></div>
+        <div id="answers-grid"></div>
+        <div id="result-msg"></div>
+      </div>
+    </div>
+    <!-- PANNEAU LATÉRAL -->
+    <div id="side-panel">
+      <h2>Équipes &amp; Fromages</h2>
+      <div id="teams-list"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+</div>
+
+<!-- WINNER -->
+<div id="winner-overlay">
+  <div class="confetti">🏆🧀🎉</div>
+  <div id="winner-box">
+    <h1 id="winner-title"></h1>
+    <p id="winner-sub"></p>
+  </div>
+  <button class="btn-primary" style="max-width:200px" onclick="resetGame()">Nouvelle partie</button>
+</div>
+<div id="toast"></div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCvXbl2nz3KAO36yj1q-fcqJ5FxEJG2x6w",
+  authDomain: "trivial-poursuite.firebaseapp.com",
+  databaseURL: "https://trivial-poursuite-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "trivial-poursuite",
+  storageBucket: "trivial-poursuite.firebasestorage.app",
+  messagingSenderId: "287506850350",
+  appId: "1:287506850350:web:79b90d6beadc3297cbb5bf"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ═══════════════════════════════════════════════════════
+// CONSTANTES
+// ═══════════════════════════════════════════════════════
+const THEMES = [
+  { id:'fr', label:'Français',          color:'#0055A4', emoji:'📚', icon:'🧀' },
+  { id:'hg', label:'Hist./Géo.',         color:'#E8A000', emoji:'🗺️', icon:'🧀' },
+  { id:'ms', label:'Maths/Sciences',     color:'#009B48', emoji:'📐', icon:'🧀' },
+  { id:'ps', label:'PSE',                color:'#E63946', emoji:'🏥', icon:'🧀' },
+  { id:'eg', label:'Éco-gestion',        color:'#7B2D8B', emoji:'💼', icon:'🧀' },
+  { id:'an', label:'Anglais',            color:'#F4A261', emoji:'🇬🇧', icon:'🧀' },
+];
+
+const TEAM_COLORS = ['#0055A4','#E8A000','#009B48','#E63946'];
+const TEAM_NAMES  = ['Équipe 1','Équipe 2','Équipe 3','Équipe 4'];
+const TEAM_EMOJIS = ['🔵','🟡','🟢','🔴'];
+
+const PION_EMOJIS = ['🔵','🟡','🟢','🔴'];
+
+// ═══════════════════════════════════════════════════════
+// PLATEAU — STRUCTURE
+// 6 rayons, 3 anneaux (ext=12 cases, mid=6 cases, hub=centre)
+// anneau ext : cases 0..71  (12 par secteur)
+// anneau mid : cases 100..105 (1 par secteur, extrémité rayon)
+// centre     : case 200
+// cases rejouer : 6 (une au milieu de chaque secteur ext)
+// cases choix   : 3 (espacées)
+// cases camembert : 100..105
+// ═══════════════════════════════════════════════════════
+
+// Coordonnées polaires → cartésiennes (cx=350, cy=350)
+const CX=350, CY=350;
+const R_EXT=270, R_MID=165, R_HUB=55;
+const SEGMENTS=6, OUTER_PER_SEG=12;
+
+function polar(r, angleDeg){ 
+  const a = (angleDeg-90)*Math.PI/180;
+  return { x: CX + r*Math.cos(a), y: CY + r*Math.sin(a) };
+}
+
+// Générer toutes les cases
+// Anneau ext : 72 cases numérotées 0..71
+// Anneau mid : 6 cases numérotées 100..105 (extrémités rayons)
+// Centre : case 200
+// Cases spéciales rejouer : anneau ext case milieu de chaque secteur (cases 6,18,30,42,54,66)
+// Cases choix libre : cases 3,27,51 (3 cases espacées 120°)
+
+function getCaseAngle(id){
+  if(id===200) return 0;
+  if(id>=100&&id<=105) return (id-100)*60; // extrémité rayon i
+  // anneau ext : 72 cases, case 0 en haut
+  return (id/72)*360;
+}
+
+function getCasePos(id){
+  if(id===200) return {x:CX,y:CY};
+  if(id>=100&&id<=105){
+    const ang=(id-100)*60;
+    return polar(R_MID, ang);
+  }
+  const ang=(id/72)*360;
+  return polar(R_EXT, ang);
+}
+
+function getCaseTheme(id){
+  if(id===200) return null; // centre
+  if(id>=100&&id<=105) return THEMES[id-100];
+  // anneau ext : 72/6=12 par secteur
+  return THEMES[Math.floor(id/12)%6];
+}
+
+function isCamembert(id){ return id>=100&&id<=105; }
+function isRejouer(id){ return [6,18,30,42,54,66].includes(id); }
+function isChoixLibre(id){ return [3,27,51].includes(id); }
+
+// Adjacences pour navigation
+function getAdjacents(pos){
+  const adjs=[];
+  if(pos===200){
+    // depuis centre on peut aller sur chaque extrémité rayon
+    for(let i=0;i<6;i++) adjs.push(100+i);
+    return adjs;
+  }
+  if(pos>=100&&pos<=105){
+    // depuis extrémité rayon : centre + cases ext adjacentes
+    adjs.push(200);
+    const sect=pos-100;
+    const extBase=sect*12;
+    adjs.push(extBase, (extBase+11)%72); // deux cases ext en bordure du secteur
+    // aussi depuis le milieu du secteur sur l'anneau
+    for(let d=-2;d<=2;d++){
+      const c=(extBase+6+d+72)%72;
+      if(!adjs.includes(c)) adjs.push(c);
+    }
+    return adjs;
+  }
+  // anneau ext : voisins gauche/droite + accès rayon si c'est le début de secteur
+  adjs.push((pos+1)%72, (pos-1+72)%72);
+  // si case est la première du secteur, accès à l'extrémité rayon
+  if(pos%12===0) adjs.push(100+(pos/12));
+  return adjs;
+}
+
+// Cases atteignables depuis pos en lançant dieVal
+function getReachable(pos, dieVal){
+  // BFS pour trouver toutes les cases à exactement dieVal de distance
+  // on autorise aussi à choisir une case à distance ≤ dieVal (comme au TP)
+  const visited = new Map(); // case -> distance
+  const queue = [{id:pos, dist:0}];
+  visited.set(pos,0);
+  while(queue.length){
+    const {id,dist}=queue.shift();
+    if(dist>=dieVal) continue;
+    for(const nb of getAdjacents(id)){
+      if(!visited.has(nb)){
+        visited.set(nb,dist+1);
+        queue.push({id:nb,dist:dist+1});
+      }
+    }
+  }
+  // retourner cases à distance exacte = dieVal (et cases camembert si dieVal dépasse)
+  const result=[];
+  for(const [id,d] of visited){
+    if(id!==pos && d===dieVal) result.push(id);
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════════════
+// BANQUE DE QUESTIONS (placeholder)
+// ═══════════════════════════════════════════════════════
+const QUESTIONS = {
+  fr:[
+    {q:"Quel est le COD dans : 'Le professeur corrige les copies' ?", opts:["le professeur","corrige","les copies","le corrigé"], ans:2},
+    {q:"Quelle figure de style est utilisée dans 'La vie est un long fleuve tranquille' ?", opts:["métaphore","hyperbole","allitération","anaphore"], ans:0},
+    {q:"Quel temps verbal exprime une action antérieure à une autre au passé ?", opts:["imparfait","passé simple","plus-que-parfait","conditionnel passé"], ans:2},
+    {q:"Quel registre de langue correspond à : 'Je ne sais pas' ?", opts:["familier","courant","soutenu","argotique"], ans:1},
+    {q:"Un texte argumentatif a pour but de...", opts:["raconter une histoire","décrire un paysage","convaincre le lecteur","expliquer un phénomène"], ans:2},
+  ],
+  hg:[
+    {q:"En quelle année a eu lieu la Révolution française ?", opts:["1789","1799","1776","1804"], ans:0},
+    {q:"Quelle est la capitale de l'Australie ?", opts:["Sydney","Melbourne","Canberra","Brisbane"], ans:2},
+    {q:"Quel fleuve traverse Paris ?", opts:["Loire","Rhône","Garonne","Seine"], ans:3},
+    {q:"Qui était le président français durant la 2ème Guerre mondiale ?", opts:["Pétain","De Gaulle","Léon Blum","Pompidou"], ans:0},
+    {q:"Quel pays est le plus peuplé du monde en 2024 ?", opts:["Chine","États-Unis","Inde","Brésil"], ans:2},
+  ],
+  ms:[
+    {q:"Combien font 2³ × 2⁴ ?", opts:["2⁷","2¹²","64","32"], ans:0},
+    {q:"Quelle est la formule de l'eau ?", opts:["CO₂","H₂O","NaCl","O₂"], ans:1},
+    {q:"Quelle est la dérivée de f(x) = x² ?", opts:["x","2x","x²","2x²"], ans:1},
+    {q:"Dans un triangle rectangle, sin(30°) =", opts:["√3/2","1/2","√2/2","1"], ans:1},
+    {q:"Quelle est l'unité du courant électrique ?", opts:["Volt","Ohm","Ampère","Watt"], ans:2},
+  ],
+  ps:[
+    {q:"Que signifie PSE ?", opts:["Prévention Santé Environnement","Protection Sociale Entreprise","Prévention Sécurité Emploi","Protection Santé Emploi"], ans:0},
+    {q:"Quelle loi encadre le droit du travail en France ?", opts:["Code civil","Code pénal","Code du travail","Code de commerce"], ans:2},
+    {q:"À quel âge peut-on travailler légalement en France (apprentissage) ?", opts:["14 ans","15 ans","16 ans","18 ans"], ans:1},
+    {q:"Qu'est-ce que le TMS en milieu professionnel ?", opts:["Trouble Mental Sévère","Trouble Musculo-Squelettique","Taux de Mortalité Sectoriel","Temps de Mise en Sécurité"], ans:1},
+    {q:"Quel organisme gère l'assurance maladie en France ?", opts:["URSSAF","CPAM","Pôle Emploi","CARSAT"], ans:1},
+  ],
+  eg:[
+    {q:"Qu'est-ce que le PIB ?", opts:["Produit Intérieur Brut","Prix Indicatif de Base","Plan d'Investissement Budgétaire","Profit Individuel Brut"], ans:0},
+    {q:"Un bilan comptable est composé de...", opts:["recettes et dépenses","actif et passif","charges et produits","bénéfices et pertes"], ans:1},
+    {q:"Que signifie CDD ?", opts:["Contrat De Durée","Contrat à Durée Déterminée","Contrat Déclaré Définitif","Contrat De Départ"], ans:1},
+    {q:"Qu'est-ce que la TVA ?", opts:["Taxe sur la Valeur Ajoutée","Taxe sur les Ventes Annuelles","Taux de Variation des Actifs","Taxe sur les Virements Automatiques"], ans:0},
+    {q:"Un compte courant d'associé est classé dans...", opts:["les capitaux propres","les immobilisations","les dettes financières","les stocks"], ans:2},
+  ],
+  an:[
+    {q:"What is the past tense of 'go'?", opts:["goed","went","gone","go"], ans:1},
+    {q:"'I work here since 5 years' — correct?", opts:["Yes","No, use 'have worked'","No, use 'worked'","No, use 'am working'"], ans:1},
+    {q:"What does 'deadline' mean in French?", opts:["Ligne morte","Limite de temps","Date limite","Fin de journée"], ans:2},
+    {q:"Which is formal English?", opts:["Hey, what's up?","How are you doing?","I trust this email finds you well.","Wanna meet?"], ans:2},
+    {q:"'Could you please send me the report?' — quel type de phrase ?", opts:["order","request","statement","question"], ans:1},
+  ],
+};
+
+function getQuestion(themeId){
+  const pool = QUESTIONS[themeId];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// ═══════════════════════════════════════════════════════
+// ÉTAT LOCAL
+// ═══════════════════════════════════════════════════════
+let myTeam=null, gameCode=null, gameRef=null, unsubscribe=null;
+let timerInterval=null, timerVal=0;
+let localGameState=null;
+let selectedCell=null, answeredThisTurn=false;
+
+// ═══════════════════════════════════════════════════════
+// JOIN
+// ═══════════════════════════════════════════════════════
+window.selectTeam=function(t){
+  myTeam=t;
+  document.querySelectorAll('.team-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelector(`.team-btn[data-team="${t}"]`).classList.add('selected');
+  checkJoinReady();
+};
+document.getElementById('input-code').addEventListener('input',checkJoinReady);
+function checkJoinReady(){
+  const code=document.getElementById('input-code').value.trim();
+  document.getElementById('btn-join').disabled = !(code.length>=3 && myTeam);
+}
+
+window.joinGame=async function(){
+  const code=document.getElementById('input-code').value.trim().toUpperCase();
+  gameCode=code;
+  gameRef=ref(db,`games/${code}`);
+  const snap=await get(gameRef);
+  if(!snap.exists()){
+    await initGame();
+  } else {
+    // rejoindre partie existante
+    await update(ref(db,`games/${code}/players`),{[`team${myTeam}`]: true});
+  }
+  startListening();
+  document.getElementById('screen-join').style.display='none';
+  document.getElementById('screen-game').style.display='block';
+  setupMyBadge();
+  buildBoard();
+  buildLegend();
+};
+
+async function initGame(){
+  const state={
+    phase:'waiting', // waiting|roll|move|question|result
+    currentTeam:1,
+    positions:{team1:200, team2:200, team3:200, team4:200},
+    fromages:{
+      team1:[false,false,false,false,false,false],
+      team2:[false,false,false,false,false,false],
+      team3:[false,false,false,false,false,false],
+      team4:[false,false,false,false,false,false],
+    },
+    dieValue:null,
+    reachableCells:[],
+    selectedCell:null,
+    currentQuestion:null,
+    timerEnd:null,
+    winner:null,
+    players:{[`team${myTeam}`]:true},
+    scores:{team1:0,team2:0,team3:0,team4:0},
+  };
+  await set(gameRef, state);
+}
+
+function startListening(){
+  unsubscribe=onValue(gameRef,(snap)=>{
+    if(!snap.exists()) return;
+    localGameState=snap.val();
+    renderGame(localGameState);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// PLATEAU SVG
+// ═══════════════════════════════════════════════════════
+function buildBoard(){
+  const svg=document.getElementById('board-svg');
+  svg.innerHTML='';
+
+  // Fond
+  const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  bg.setAttribute('cx',CX); bg.setAttribute('cy',CY); bg.setAttribute('r',R_EXT+20);
+  bg.setAttribute('fill','#0d1b2a'); bg.setAttribute('stroke','rgba(255,255,255,0.1)'); bg.setAttribute('stroke-width','1.5');
+  svg.appendChild(bg);
+
+  // Secteurs de fond (6 tranches colorées)
+  for(let s=0;s<6;s++){
+    const ang1=(s*60-90)*Math.PI/180;
+    const ang2=((s+1)*60-90)*Math.PI/180;
+    const r=R_EXT+18;
+    const x1=CX+r*Math.cos(ang1), y1=CY+r*Math.sin(ang1);
+    const x2=CX+r*Math.cos(ang2), y2=CY+r*Math.sin(ang2);
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M ${CX} ${CY} L ${x1} ${y1} A ${r} ${r} 0 0 1 ${x2} ${y2} Z`);
+    path.setAttribute('fill', THEMES[s].color+'22');
+    path.setAttribute('stroke','none');
+    svg.appendChild(path);
+
+    // Ligne de rayon
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    const rp=polar(R_EXT+18,(s*60));
+    line.setAttribute('x1',CX); line.setAttribute('y1',CY);
+    line.setAttribute('x2',rp.x); line.setAttribute('y2',rp.y);
+    line.setAttribute('stroke','rgba(255,255,255,0.08)'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+  }
+
+  // Cases anneau extérieur (72 cases)
+  for(let i=0;i<72;i++){
+    drawCase(svg, i);
+  }
+
+  // Cases milieu de rayon (camembert) 100..105
+  for(let i=0;i<6;i++){
+    drawCase(svg, 100+i);
+  }
+
+  // Centre
+  drawCase(svg, 200);
+
+  // Labels thèmes
+  for(let s=0;s<6;s++){
+    const ang=s*60+30; // milieu du secteur
+    const p=polar(R_EXT+12, ang);
+    // on ne peut pas placer le texte à l'ext du plateau, on saute
+  }
+}
+
+function drawCase(svg, id){
+  const pos=getCasePos(id);
+  let r=14, stroke='rgba(255,255,255,0.25)', fill='#1a2a3a', strokeW=1.5;
+  const theme=getCaseTheme(id);
+  const color=theme?theme.color:'#ffd700';
+
+  if(id===200){
+    // centre hexagonal
+    r=R_HUB;
+    const hex=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    const pts=[];
+    for(let i=0;i<6;i++){
+      const a=(i*60-30)*Math.PI/180;
+      pts.push(`${CX+r*Math.cos(a)},${CY+r*Math.sin(a)}`);
+    }
+    hex.setAttribute('points',pts.join(' '));
+    hex.setAttribute('fill','#0d1b2a');
+    hex.setAttribute('stroke','rgba(255,215,0,0.6)'); hex.setAttribute('stroke-width','2');
+    hex.setAttribute('id','case-200');
+    svg.appendChild(hex);
+    // étoile centrale
+    const star=document.createElementNS('http://www.w3.org/2000/svg','text');
+    star.setAttribute('x',CX); star.setAttribute('y',CY+6);
+    star.setAttribute('text-anchor','middle'); star.setAttribute('font-size','32');
+    star.textContent='⭐';
+    svg.appendChild(star);
+    return;
+  }
+
+  if(isCamembert(id)){
+    // case camembert — grande, colorée
+    r=20; fill=color; strokeW=3; stroke='#fff';
+    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
+    circ.setAttribute('fill',fill+'cc'); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
+    circ.setAttribute('id',`case-${id}`);
+    circ.setAttribute('class','board-case camembert-case');
+    circ.setAttribute('data-id',id);
+    svg.appendChild(circ);
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+5);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','16');
+    txt.textContent='🧀'; txt.setAttribute('pointer-events','none');
+    svg.appendChild(txt);
+    return;
+  }
+
+  if(isRejouer(id)){
+    r=14; fill='#1a1a2e'; stroke='#ffd700'; strokeW=2;
+    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
+    circ.setAttribute('fill',fill); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
+    circ.setAttribute('id',`case-${id}`);
+    circ.setAttribute('class','board-case');
+    circ.setAttribute('data-id',id);
+    svg.appendChild(circ);
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+4);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','11');
+    txt.setAttribute('fill','#ffd700'); txt.setAttribute('font-weight','bold');
+    txt.textContent='↺'; txt.setAttribute('pointer-events','none');
+    svg.appendChild(txt);
+    return;
+  }
+
+  if(isChoixLibre(id)){
+    r=14; fill='#1a1a2e'; stroke='#fff'; strokeW=2;
+    const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
+    circ.setAttribute('fill',fill); circ.setAttribute('stroke',stroke); circ.setAttribute('stroke-width',strokeW);
+    circ.setAttribute('id',`case-${id}`);
+    circ.setAttribute('class','board-case');
+    circ.setAttribute('data-id',id);
+    svg.appendChild(circ);
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',pos.x); txt.setAttribute('y',pos.y+4);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','10');
+    txt.setAttribute('fill','#fff');
+    txt.textContent='★'; txt.setAttribute('pointer-events','none');
+    svg.appendChild(txt);
+    return;
+  }
+
+  // Case normale
+  const circ=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  circ.setAttribute('cx',pos.x); circ.setAttribute('cy',pos.y); circ.setAttribute('r',r);
+  circ.setAttribute('fill',color+'55'); circ.setAttribute('stroke',color+'99'); circ.setAttribute('stroke-width',strokeW);
+  circ.setAttribute('id',`case-${id}`);
+  circ.setAttribute('class','board-case');
+  circ.setAttribute('data-id',id);
+  svg.appendChild(circ);
+}
+
+function buildLegend(){
+  const leg=document.getElementById('legend');
+  leg.innerHTML='<div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Thèmes</div>';
+  THEMES.forEach(t=>{
+    leg.innerHTML+=`<div class="legend-item"><div class="legend-dot" style="background:${t.color}"></div><span>${t.emoji} ${t.label}</span></div>`;
+  });
+  leg.innerHTML+=`<div class="legend-item" style="margin-top:4px"><div class="legend-dot" style="background:#ffd700"></div><span>↺ Rejouer</span></div>`;
+  leg.innerHTML+=`<div class="legend-item"><div class="legend-dot" style="background:#fff"></div><span>★ Thème libre</span></div>`;
+}
+
+function setupMyBadge(){
+  document.getElementById('my-dot').style.background=TEAM_COLORS[myTeam-1];
+  document.getElementById('my-label').textContent=TEAM_NAMES[myTeam-1];
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDU ÉTAT
+// ═══════════════════════════════════════════════════════
+function renderGame(state){
+  if(!state) return;
+  if(state.winner){
+    showWinner(state.winner);
+    return;
+  }
+
+  const ct=state.currentTeam;
+  const isMyTurn=(ct===myTeam);
+
+  // Top bar
+  document.getElementById('turn-info').textContent=
+    `${TEAM_EMOJIS[ct-1]} ${TEAM_NAMES[ct-1]}` + (isMyTurn?' — Votre tour !':'');
+  document.getElementById('turn-info').style.color=TEAM_COLORS[ct-1];
+
+  const phaseLabels={
+    waiting:'En attente de joueurs...',
+    roll:'Lancer le dé',
+    move:'Choisir une case',
+    question:'Question en cours',
+    result:'Résultat',
+  };
+  document.getElementById('phase-info').textContent=phaseLabels[state.phase]||'';
+
+  // Timer
+  renderTimer(state);
+
+  // Action zone
+  renderActionZone(state, isMyTurn);
+
+  // Question
+  renderQuestion(state, isMyTurn);
+
+  // Pions
+  renderPions(state);
+
+  // Cases surlignées
+  renderHighlight(state);
+
+  // Panel équipes
+  renderTeamsPanel(state);
+}
+
+function renderTimer(state){
+  const timerEl=document.getElementById('timer-display');
+  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+  if(!state.timerEnd || state.phase==='result' || state.phase==='waiting'){
+    timerEl.textContent='—'; timerEl.className='';
+    return;
+  }
+  function tick(){
+    const rem=Math.max(0, Math.ceil((state.timerEnd - Date.now())/1000));
+    timerEl.textContent=rem;
+    timerEl.className=rem<=5?'urgent':'';
+    if(rem<=0){
+      clearInterval(timerInterval); timerInterval=null;
+      timerEl.textContent='0';
+    }
+  }
+  tick();
+  timerInterval=setInterval(tick,500);
+}
+
+function renderActionZone(state, isMyTurn){
+  const zone=document.getElementById('action-zone');
+  zone.innerHTML='';
+
+  if(state.phase==='waiting'){
+    zone.innerHTML=`<span class="action-msg">En attente des équipes... (${Object.keys(state.players||{}).length}/4)</span>
+    ${isMyTurn||myTeam===1?`<button class="btn-primary" style="max-width:220px" onclick="startGame()">Lancer la partie</button>`:''}`;
+    return;
+  }
+
+  if(state.phase==='roll'){
+    if(isMyTurn){
+      zone.innerHTML=`<div id="die-display">🎲</div>
+      <button id="btn-roll" onclick="rollDie()">Lancer le dé</button>`;
+    } else {
+      zone.innerHTML=`<span class="action-msg">${TEAM_NAMES[state.currentTeam-1]} lance le dé...</span>`;
+    }
+    return;
+  }
+
+  if(state.phase==='move'){
+    const dieVal=state.dieValue;
+    zone.innerHTML=`<div id="die-display">${getDieFace(dieVal)}</div>
+    <span class="action-msg">${isMyTurn?'Cliquez sur une case surlignée pour vous déplacer':'En attente du déplacement...'}</span>`;
+    return;
+  }
+
+  if(state.phase==='question'||state.phase==='result'){
+    const dieVal=state.dieValue;
+    zone.innerHTML=`<div id="die-display" style="font-size:1.8rem">${getDieFace(dieVal)}</div>`;
+    return;
+  }
+}
+
+function getDieFace(n){
+  return ['','⚀','⚁','⚂','⚃','⚄','⚅'][n]||'🎲';
+}
+
+function renderQuestion(state, isMyTurn){
+  const panel=document.getElementById('question-panel');
+  if(state.phase!=='question'&&state.phase!=='result'){
+    panel.classList.remove('visible');
+    return;
+  }
+  panel.classList.add('visible');
+  if(!state.currentQuestion) return;
+
+  const q=state.currentQuestion;
+  const theme=THEMES.find(t=>t.id===q.themeId);
+
+  const badge=document.getElementById('question-theme-badge');
+  badge.textContent=`${theme.emoji} ${theme.label}`;
+  badge.style.background=theme.color+'33';
+  badge.style.color=theme.color;
+  badge.style.border=`1px solid ${theme.color}55`;
+
+  document.getElementById('question-text').textContent=q.text;
+
+  const grid=document.getElementById('answers-grid');
+  grid.innerHTML='';
+  const letters=['A','B','C','D'];
+  q.opts.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='answer-btn';
+    btn.textContent=`${letters[i]}. ${opt}`;
+    btn.disabled=!isMyTurn || state.phase==='result' || state.answeredBy!=null;
+
+    if(state.phase==='result'||state.answeredBy!=null){
+      if(i===q.ans) btn.classList.add('reveal-correct');
+      if(state.chosenAnswer===i && i!==q.ans) btn.classList.add('wrong');
+    }
+
+    btn.addEventListener('click',()=>{ if(isMyTurn && state.phase==='question') submitAnswer(i, q.ans); });
+    grid.appendChild(btn);
+  });
+
+  const res=document.getElementById('result-msg');
+  if(state.phase==='result'||state.answeredBy!=null){
+    res.style.display='block';
+    if(state.answeredBy==null){
+      res.className=''; res.textContent='⏱️ Temps écoulé ! Mauvaise réponse.';
+      res.style.background='rgba(230,57,70,0.2)'; res.style.color='#f87171';
+    } else if(state.chosenAnswer===q.ans){
+      res.className='win'; res.textContent='✅ Bonne réponse !';
+    } else {
+      res.className='lose'; res.textContent=`❌ Mauvaise réponse ! La bonne réponse était : ${letters[q.ans]}`;
+    }
+    if(state.nextTeamIn && isMyTurn){
+      // rien, le timer gère
+    }
+  } else {
+    res.style.display='none';
+  }
+}
+
+function renderPions(state){
+  // Supprimer anciens pions
+  document.querySelectorAll('.pion-marker').forEach(e=>e.remove());
+  const svg=document.getElementById('board-svg');
+  const positions=state.positions||{};
+  const offsets=[{dx:-8,dy:-8},{dx:8,dy:-8},{dx:-8,dy:8},{dx:8,dy:8}];
+  for(let t=1;t<=4;t++){
+    const posId=positions[`team${t}`]??200;
+    const p=getCasePos(posId);
+    const off=offsets[t-1];
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','pion pion-marker');
+    g.setAttribute('transform',`translate(${p.x+off.dx},${p.y+off.dy})`);
+    // cercle coloré
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',0); c.setAttribute('cy',0); c.setAttribute('r',9);
+    c.setAttribute('fill',TEAM_COLORS[t-1]);
+    c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','1.5');
+    g.appendChild(c);
+    // numéro
+    const txt=document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x',0); txt.setAttribute('y',4);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size','10');
+    txt.setAttribute('fill','#fff'); txt.setAttribute('font-weight','bold');
+    txt.textContent=t;
+    g.appendChild(txt);
+    svg.appendChild(g);
+  }
+}
+
+function renderHighlight(state){
+  // Reset toutes les cases
+  document.querySelectorAll('.board-case').forEach(el=>{
+    el.style.filter='';
+    el.style.cursor='default';
+    el.style.strokeWidth='';
+    el.onclick=null;
+  });
+  // Supprimer anciens glows
+  document.querySelectorAll('.reach-glow').forEach(e=>e.remove());
+
+  if(state.phase!=='move') return;
+  const reach=state.reachableCells||[];
+  const isMyTurn=state.currentTeam===myTeam;
+  if(!isMyTurn) return;
+
+  const svg=document.getElementById('board-svg');
+  reach.forEach(id=>{
+    const el=document.getElementById(`case-${id}`);
+    if(!el) return;
+    el.style.filter='brightness(1.8) drop-shadow(0 0 6px #ffd700)';
+    el.style.cursor='pointer';
+    el.onclick=()=>chooseCell(id);
+
+    // glow ring
+    const pos=getCasePos(id);
+    const glow=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    glow.setAttribute('cx',pos.x); glow.setAttribute('cy',pos.y); glow.setAttribute('r',id>=100?24:17);
+    glow.setAttribute('fill','none'); glow.setAttribute('stroke','#ffd700');
+    glow.setAttribute('stroke-width','2'); glow.setAttribute('opacity','0.5');
+    glow.setAttribute('class','reach-glow');
+    svg.appendChild(glow);
+  });
+}
+
+function renderTeamsPanel(state){
+  const list=document.getElementById('teams-list');
+  list.innerHTML='';
+  for(let t=1;t<=4;t++){
+    const fromages=state.fromages?.[`team${t}`]||[false,false,false,false,false,false];
+    const score=state.scores?.[`team${t}`]||0;
+    const active=state.currentTeam===t;
+    const div=document.createElement('div');
+    div.className='team-panel'+(active?' active-turn':'');
+    div.innerHTML=`
+      <div class="team-panel-header">
+        <div class="team-dot" style="background:${TEAM_COLORS[t-1]}"></div>
+        <div class="team-name-side">${TEAM_NAMES[t-1]}</div>
+        <div class="team-score">${score} pt${score>1?'s':''}</div>
+      </div>
+      <div class="fromages-grid">
+        ${THEMES.map((th,i)=>`
+          <div class="fromage-slot${fromages[i]?' earned':''}" style="${fromages[i]?`background:${th.color}33;border:2px solid ${th.color};`:`border-color:${th.color}44;`}" title="${th.label}">
+            ${fromages[i]?'🧀':''}
+          </div>
+        `).join('')}
+      </div>`;
+    list.appendChild(div);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ACTIONS JOUEUR
+// ═══════════════════════════════════════════════════════
+window.startGame=async function(){
+  await update(gameRef,{ phase:'roll', currentTeam:1 });
+};
+
+window.rollDie=async function(){
+  if(!localGameState||localGameState.currentTeam!==myTeam) return;
+  // Animation locale
+  const dieEl=document.getElementById('die-display');
+  if(dieEl){ dieEl.classList.add('rolling'); }
+  await new Promise(r=>setTimeout(r,600));
+  if(dieEl){ dieEl.classList.remove('rolling'); }
+
+  const val=Math.floor(Math.random()*6)+1;
+  const pos=localGameState.positions[`team${myTeam}`]??200;
+  const reach=getReachable(pos,val);
+
+  const timerEnd=Date.now()+10000; // 10s pour choisir
+  await update(gameRef,{
+    phase:'move',
+    dieValue:val,
+    reachableCells:reach,
+    selectedCell:null,
+    timerEnd,
+    currentQuestion:null,
+    answeredBy:null,
+    chosenAnswer:null,
+  });
+
+  // Timer serveur : si pas de choix dans 10s → case aléatoire
+  setTimeout(async()=>{
+    const snap=await get(gameRef);
+    const s=snap.val();
+    if(s&&s.phase==='move'&&s.currentTeam===myTeam){
+      // choisir aléatoirement
+      const r=s.reachableCells||[];
+      if(r.length>0){
+        const c=r[Math.floor(Math.random()*r.length)];
+        await chooseCell(c, true);
+      } else {
+        await nextTurn();
+      }
+    }
+  },10200);
+};
+
+async function chooseCell(id, auto=false){
+  if(!localGameState||localGameState.currentTeam!==myTeam) return;
+  if(localGameState.phase!=='move') return;
+  const pos=id;
+
+  // Déterminer thème
+  let themeId=null;
+  if(isChoixLibre(id)){
+    // thème libre : l'équipe choisit (TODO: picker) — on prend le premier non acquis
+    const fromages=localGameState.fromages[`team${myTeam}`];
+    const idx=fromages.findIndex(v=>!v);
+    themeId=idx>=0?THEMES[idx].id:THEMES[0].id;
+  } else if(id===200){
+    // centre : rejouer
+    await update(gameRef,{
+      phase:'roll',
+      positions:{...localGameState.positions,[`team${myTeam}`]:id},
+      reachableCells:[],
+      timerEnd:null,
+    });
+    return;
+  } else {
+    const theme=getCaseTheme(id);
+    themeId=theme?theme.id:null;
+  }
+
+  // Case rejouer
+  if(isRejouer(id)){
+    await update(gameRef,{
+      phase:'roll',
+      positions:{...localGameState.positions,[`team${myTeam}`]:id},
+      reachableCells:[],
+      timerEnd:null,
+    });
+    showToast('↺ Rejouer !');
+    return;
+  }
+
+  // Générer question
+  const q=getQuestion(themeId);
+  const question={
+    text:q.q,
+    opts:q.opts,
+    ans:q.ans,
+    themeId,
+    isCamembert:isCamembert(id),
+    cellId:id,
+  };
+
+  const timerEnd=Date.now()+30000;
+  await update(gameRef,{
+    phase:'question',
+    positions:{...localGameState.positions,[`team${myTeam}`]:id},
+    reachableCells:[],
+    selectedCell:id,
+    currentQuestion:question,
+    answeredBy:null,
+    chosenAnswer:null,
+    timerEnd,
+  });
+
+  // Timer question : 30s
+  setTimeout(async()=>{
+    const snap=await get(gameRef);
+    const s=snap.val();
+    if(s&&s.phase==='question'&&s.currentTeam===myTeam&&s.answeredBy==null){
+      await handleAnswerResult(s, null, false);
+    }
+  },30500);
+}
+
+async function submitAnswer(chosen, correct){
+  if(!localGameState||localGameState.currentTeam!==myTeam) return;
+  if(localGameState.answeredBy!=null) return;
+  const isCorrect=chosen===correct;
+  await update(gameRef,{
+    answeredBy:`team${myTeam}`,
+    chosenAnswer:chosen,
+    phase:'result',
+    timerEnd:null,
+  });
+  await handleAnswerResult(localGameState, chosen, isCorrect);
+}
+
+async function handleAnswerResult(state, chosen, isCorrect){
+  const ct=state.currentTeam;
+  const q=state.currentQuestion;
+  let updates={phase:'result', timerEnd:null};
+
+  if(isCorrect){
+    // Bonne réponse
+    updates[`scores/team${ct}`]=(state.scores?.[`team${ct}`]||0)+1;
+    if(q&&q.isCamembert){
+      const idx=THEMES.findIndex(t=>t.id===q.themeId);
+      if(idx>=0){
+        updates[`fromages/team${ct}/${idx}`]=true;
+      }
+    }
+    await update(gameRef,updates);
+    // Vérifier victoire
+    const snap=await get(gameRef);
+    const s=snap.val();
+    const fromages=s.fromages[`team${ct}`];
+    if(fromages.every(v=>v)){
+      await update(gameRef,{winner:ct, phase:'finished'});
+      return;
+    }
+    // Rejoue
+    showToast('✅ Bonne réponse ! Vous rejouez !');
+    setTimeout(async()=>{
+      await update(gameRef,{phase:'roll',timerEnd:null,currentQuestion:null,answeredBy:null,chosenAnswer:null});
+    },3000);
+  } else {
+    await update(gameRef,{...updates, answeredBy: state.answeredBy??null});
+    showToast('❌ Mauvaise réponse...');
+    setTimeout(async()=>{
+      await nextTurn();
+    },3000);
+  }
+}
+
+async function nextTurn(){
+  const snap=await get(gameRef);
+  const s=snap.val();
+  if(!s) return;
+  const next=(s.currentTeam%4)+1;
+  await update(gameRef,{
+    phase:'roll',
+    currentTeam:next,
+    dieValue:null,
+    reachableCells:[],
+    selectedCell:null,
+    currentQuestion:null,
+    answeredBy:null,
+    chosenAnswer:null,
+    timerEnd:null,
+  });
+}
+
+window.resetGame=async function(){
+  if(!gameRef) return;
+  document.getElementById('winner-overlay').classList.remove('visible');
+  await initGame();
+  await update(gameRef,{phase:'roll'});
+};
+
+// ═══════════════════════════════════════════════════════
+// UTILITAIRES
+// ═══════════════════════════════════════════════════════
+function showWinner(team){
+  const ov=document.getElementById('winner-overlay');
+  ov.classList.add('visible');
+  document.getElementById('winner-title').textContent=`${TEAM_EMOJIS[team-1]} ${TEAM_NAMES[team-1]} gagne !`;
+  document.getElementById('winner-sub').textContent='Tous les fromages collectés ! 🧀🧀🧀🧀🧀🧀';
+}
+
+let toastTimeout=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  if(toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// Expose pour debug
+window._db=db; window._gameRef=gameRef;
+</script>
+</body>
+</html>
