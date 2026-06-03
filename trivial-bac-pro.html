@@ -10,24 +10,34 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;}
 
-/* ── LOBBY (prof) ── */
-#screen-lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
-.lobby-title{font-family:'Fredoka One',cursive;font-size:2.6rem;color:var(--gold);text-shadow:3px 3px 0 rgba(0,0,0,0.4);text-align:center;line-height:1.1;}
-.lobby-title span{color:#fff;}
-.lobby-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:720px;}
-.lobby-card h2{font-family:'Fredoka One',cursive;color:var(--gold);font-size:1.2rem;margin-bottom:14px;text-align:center;}
+/* ── WELCOME ── */
+#screen-welcome{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:24px;}
+.welcome-title{font-family:'Fredoka One',cursive;font-size:2.6rem;color:var(--gold);text-shadow:3px 3px 0 rgba(0,0,0,0.4);text-align:center;line-height:1.1;}
+.welcome-title span{color:#fff;}
+.welcome-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:460px;display:flex;flex-direction:column;gap:18px;}
+.welcome-sep{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.3);font-size:.85rem;font-weight:700;}
+.welcome-sep::before,.welcome-sep::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.12);}
 .field-label{display:block;color:rgba(255,255,255,0.6);font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
 .text-input{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:10px;color:#fff;font-size:1.1rem;font-weight:700;padding:10px 14px;width:100%;font-family:'Nunito',sans-serif;text-transform:uppercase;}
 .text-input::placeholder{color:rgba(255,255,255,0.3);text-transform:none;}
 .text-input:focus{outline:none;border-color:var(--gold);}
-.teams-config{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;}
-@media(max-width:520px){.teams-config{grid-template-columns:1fr;}}
-.team-cfg{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;padding:12px;}
-.team-cfg h3{font-size:0.9rem;font-weight:800;margin-bottom:8px;}
-.radio-row{display:flex;gap:6px;flex-wrap:wrap;}
-.radio-row label{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.7);transition:all .15s;display:flex;align-items:center;gap:4px;}
-.radio-row label:has(input:checked){background:rgba(255,255,255,0.22);border-color:#fff;color:#fff;}
-.radio-row input[type=radio]{display:none;}
+
+/* ── WAITING ── */
+#screen-waiting{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
+.waiting-title{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--gold);text-align:center;}
+.waiting-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:460px;display:flex;flex-direction:column;gap:16px;}
+.code-box{background:rgba(0,0,0,0.3);border:2px dashed rgba(255,255,255,0.25);border-radius:14px;padding:16px;text-align:center;}
+.code-label{font-size:.75rem;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.code-value{font-family:'Fredoka One',cursive;font-size:2.8rem;color:var(--gold);letter-spacing:6px;}
+.w-my-team-row{text-align:center;font-size:.95rem;color:rgba(255,255,255,0.6);}
+.w-team-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);transition:all .2s;}
+.w-team-item.connected{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);}
+.w-team-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.w-team-name{flex:1;font-size:.88rem;font-weight:700;}
+.w-tag-ok{font-size:.75rem;font-weight:800;color:#4ade80;}
+.w-wait-msg{display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,0.45);font-size:.88rem;}
+
+/* ── BOUTONS ── */
 .btn-gold{background:linear-gradient(135deg,#f0c040,#e09020);color:#111;border:none;border-radius:14px;padding:14px 40px;font-size:1.1rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(240,192,64,0.35);}
 .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(240,192,64,0.5);}
 .btn-gold:disabled{background:#444;color:#666;cursor:not-allowed;transform:none;box-shadow:none;}
@@ -35,35 +45,6 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 .btn-outline:hover{border-color:#fff;background:rgba(255,255,255,0.1);}
 .btn-danger{background:rgba(230,57,70,0.15);color:#f87171;border:2px solid rgba(230,57,70,0.4);border-radius:12px;padding:10px 20px;font-size:0.88rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;}
 .btn-danger:hover{background:rgba(230,57,70,0.3);border-color:#f87171;}
-#host-controls{position:fixed;bottom:16px;right:16px;z-index:100;display:none;flex-direction:column;align-items:flex-end;gap:8px;}
-#host-badge{background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:20px;padding:5px 12px;font-size:0.7rem;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-#confirm-kill{display:none;background:rgba(15,20,30,0.97);border:2px solid rgba(230,57,70,0.6);border-radius:14px;padding:18px;max-width:250px;text-align:center;gap:10px;flex-direction:column;}
-#confirm-kill.vis{display:flex;}
-#confirm-kill p{color:rgba(255,255,255,0.65);font-size:0.82rem;line-height:1.5;}
-.btn-kill-ok{background:#e63946;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:0.88rem;font-weight:800;font-family:'Nunito',sans-serif;cursor:pointer;}
-.btn-kill-no{background:transparent;color:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:7px 14px;font-size:0.82rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;}
-
-/* ── QR / LINKS ── */
-#screen-links{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
-.links-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--gold);text-align:center;}
-.links-subtitle{color:rgba(255,255,255,0.6);font-size:0.95rem;text-align:center;max-width:500px;}
-.links-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;width:100%;max-width:700px;}
-@media(max-width:520px){.links-grid{grid-template-columns:1fr;}}
-.link-card{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.15);border-radius:16px;padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;}
-.link-card h3{font-size:1rem;font-weight:800;}
-.link-url{background:rgba(0,0,0,0.3);border-radius:8px;padding:8px 12px;font-size:0.72rem;color:rgba(255,255,255,0.7);word-break:break-all;width:100%;font-family:monospace;}
-.qr-placeholder{width:100px;height:100px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:rgba(255,255,255,0.3);}
-canvas.qr-canvas{border-radius:8px;}
-
-/* ── JOIN (équipe) ── */
-#screen-join{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
-.join-title{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--gold);text-align:center;}
-.join-card{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:20px;padding:28px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;text-align:center;}
-.team-badge{display:inline-block;padding:12px 28px;border-radius:14px;font-family:'Fredoka One',cursive;font-size:1.8rem;margin:0 auto;}
-.join-status{font-size:0.9rem;color:rgba(255,255,255,0.6);}
-.join-waiting{display:flex;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,0.5);font-size:0.85rem;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;}
 
 /* ── THÈME SELECT ── */
 #screen-themes{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;gap:20px;}
@@ -133,51 +114,63 @@ canvas.qr-canvas{border-radius:8px;}
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(16px);background:rgba(15,20,30,0.96);color:#fff;padding:9px 20px;border-radius:20px;font-size:.88rem;font-weight:700;z-index:500;opacity:0;transition:all .28s;pointer-events:none;border:1px solid rgba(255,255,255,0.12);white-space:nowrap;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* ── WINNER ── */
+/* ── WINNER / END ── */
 #winner-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
 #winner-overlay.vis{display:flex;}
 #winner-box{background:var(--bg2);border:2px solid rgba(255,255,255,0.12);border-radius:22px;padding:44px;text-align:center;max-width:400px;}
 #winner-box h1{font-family:'Fredoka One',cursive;font-size:2.3rem;margin-bottom:6px;}
 #winner-box p{color:rgba(255,255,255,0.55);font-size:.95rem;margin-bottom:18px;}
 
+/* ── END CONFIRM MODAL ── */
+#end-confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:400;align-items:center;justify-content:center;}
+#end-confirm.vis{display:flex;}
+.end-confirm-box{background:#0f2540;border:2px solid rgba(230,57,70,0.5);border-radius:18px;padding:28px;max-width:320px;text-align:center;display:flex;flex-direction:column;gap:14px;}
+.end-confirm-box p{color:rgba(255,255,255,0.7);font-size:.9rem;line-height:1.55;}
+.end-confirm-btns{display:flex;gap:10px;justify-content:center;}
+
 @keyframes rollAnim{0%{transform:rotate(-18deg)scale(1.12)}25%{transform:rotate(14deg)scale(.9)}50%{transform:rotate(-10deg)scale(1.06)}75%{transform:rotate(7deg)scale(.96)}100%{transform:rotate(0)scale(1)}}
 .rolling{animation:rollAnim .55s ease-out;}
 .pion-g{transition:all .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;}
 </style>
 </head>
 <body>
 
-<!-- ══ LOBBY PROF ══ -->
-<div id="screen-lobby">
-  <div class="lobby-title">🎓 Trivial Poursuite <span>Bac Pro</span></div>
-  <div class="lobby-card">
-    <h2>Configuration de la partie</h2>
-    <div style="margin-bottom:16px">
-      <label class="field-label">Code de partie</label>
-      <input class="text-input" id="input-code" placeholder="Ex: MATHS2024" maxlength="12">
-    </div>
+<!-- ══ WELCOME ══ -->
+<div id="screen-welcome">
+  <div class="welcome-title">🎓 Trivial Poursuite <span>Bac Pro</span></div>
+  <div class="welcome-card">
+    <button class="btn-gold" onclick="createNewGame()" style="width:100%">✨ Nouvelle partie</button>
+    <div class="welcome-sep">ou rejoindre</div>
     <div>
-      <label class="field-label">Équipes</label>
-      <div class="teams-config" id="teams-config"></div>
+      <label class="field-label">Code de partie</label>
+      <input class="text-input" id="join-code-input" placeholder="Ex : ABCD" maxlength="8"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')joinWithCode()">
     </div>
+    <button class="btn-outline" onclick="joinWithCode()" style="width:100%">Rejoindre →</button>
+    <p id="welcome-error" style="color:#f87171;font-size:.82rem;text-align:center;display:none"></p>
   </div>
-  <button class="btn-gold" id="btn-create" onclick="createGame()" disabled>Créer la partie →</button>
-  <p style="color:rgba(255,255,255,0.3);font-size:.78rem">Vous êtes le professeur / organisateur</p>
 </div>
 
-<!-- ══ LIENS QR ══ -->
-<div id="screen-links">
-  <div class="links-title">🎉 Partie créée !</div>
-  <div class="links-subtitle">Partagez ces liens avec chaque équipe. Chaque équipe ouvre son propre lien sur son appareil.</div>
-  <div class="links-grid" id="links-grid"></div>
-  <button class="btn-gold" id="btn-go-themes" onclick="goToGame()">Commencer la sélection des thèmes →</button>
-</div>
-
-<!-- ══ JOIN (équipe) ══ -->
-<div id="screen-join">
-  <div class="join-title">🎓 Trivial Poursuite Bac Pro</div>
-  <div class="join-card" id="join-card">
-    <div class="join-waiting"><div class="spinner"></div> Connexion en cours...</div>
+<!-- ══ WAITING ══ -->
+<div id="screen-waiting">
+  <div class="waiting-title">🎓 Trivial Poursuite <span style="color:#fff">Bac Pro</span></div>
+  <div class="waiting-card">
+    <div class="code-box">
+      <div class="code-label">Code de la partie</div>
+      <div class="code-value" id="w-code">—</div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,0.35);margin-top:6px">Partagez ce code avec les autres équipes</div>
+    </div>
+    <div class="w-my-team-row">Vous êtes <strong id="w-my-team" style="font-size:1rem">—</strong></div>
+    <div style="display:flex;flex-direction:column;gap:6px" id="w-teams-list"></div>
+    <button class="btn-gold" id="btn-start-game" onclick="startGame()" style="display:none;width:100%">Lancer la partie →</button>
+    <div class="w-wait-msg" id="w-wait-msg" style="display:none">
+      <div class="spinner"></div>
+      <span>En attente du lancement par Équipe 1...</span>
+    </div>
+    <p id="w-status" style="color:rgba(255,255,255,0.4);font-size:.8rem;text-align:center"></p>
   </div>
 </div>
 
@@ -216,34 +209,40 @@ canvas.qr-canvas{border-radius:8px;}
         <div class="side-section-title" style="margin-bottom:8px;">Fromages</div>
         <div class="disques-grid" id="disques-grid"></div>
       </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:10px;margin-top:auto;">
+        <button class="btn-danger" onclick="askEndGame()" style="width:100%;font-size:.82rem;padding:9px 14px;">🏁 Terminer la partie</button>
+      </div>
     </div>
   </div>
 </div>
 
+<!-- ══ WINNER ══ -->
 <div id="winner-overlay">
   <div style="font-size:3.5rem">🏆</div>
   <div id="winner-box">
     <h1 id="winner-h1"></h1>
-    <p>Tous les fromages collectés ! 🧀</p>
-    <button class="btn-gold" onclick="location.reload()">Nouvelle partie</button>
+    <p id="winner-p">Tous les fromages collectés ! 🧀</p>
+    <button class="btn-gold" onclick="goToWelcome()">Nouvelle partie</button>
   </div>
 </div>
-<div id="toast"></div>
 
-<!-- CONTRÔLES HOST -->
-<div id="host-controls">
-  <div id="host-badge">👨‍🏫 Mode Prof</div>
-  <div id="confirm-kill">
-    <p>⚠️ Supprimer définitivement cette partie de Firebase ?<br>Tous les joueurs seront déconnectés.</p>
-    <button class="btn-kill-ok" onclick="doKillGame()">🗑️ Supprimer</button>
-    <button class="btn-kill-no" onclick="toggleConfirm(false)">Annuler</button>
+<!-- ══ FIN DE PARTIE CONFIRMATION ══ -->
+<div id="end-confirm">
+  <div class="end-confirm-box">
+    <div style="font-size:2rem">🏁</div>
+    <p>Terminer la partie ?<br><span style="font-size:.8rem;color:rgba(255,255,255,.45)">Tous les joueurs seront redirigés.</span></p>
+    <div class="end-confirm-btns">
+      <button class="btn-danger" onclick="doEndGame()">Terminer</button>
+      <button class="btn-outline" onclick="cancelEndGame()" style="padding:9px 18px;font-size:.88rem">Annuler</button>
+    </div>
   </div>
-  <button class="btn-danger" onclick="toggleConfirm(true)">🗑️ Supprimer la partie</button>
 </div>
+
+<div id="toast"></div>
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getDatabase,ref,set,get,update,onValue,remove}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import{getDatabase,ref,set,get,update,onValue,remove,runTransaction,onDisconnect}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const app=initializeApp({
   apiKey:"AIzaSyCvXbl2nz3KAO36yj1q-fcqJ5FxEJG2x6w",
@@ -267,7 +266,7 @@ const ALL_THEMES=[
   {id:'pse',label:'PSE',                emoji:'🏥',color:'#e76f51'},
   {id:'tech',label:'Technologie',       emoji:'⚙️',color:'#06d6a0'},
 ];
-const TC=['#e63946','#f4a261','#2a9d8f','#8338ec']; // couleurs équipes
+const TC=['#e63946','#f4a261','#2a9d8f','#8338ec'];
 const TN=['Équipe 1','Équipe 2','Équipe 3','Équipe 4'];
 
 const QUESTIONS={
@@ -418,147 +417,247 @@ function dieSVG(face,sz=68,cols){
 }
 
 /* ══ ÉTAT ══ */
-let myRole=null; // 'host' | 'team'
-let myTeam=null; // 1-4 (si role=team)
+let myTeam=null;
 let gameCode=null,gameRef=null,localState=null,timerInt=null,boardBuilt=false;
 let activeThemes=[];
 
-/* ══ DÉTECTION RÔLE VIA URL ══ */
-function parseURL(){
-  const p=new URLSearchParams(location.search);
-  const code=p.get('code');const team=parseInt(p.get('team'));
-  if(code&&team>=1&&team<=4)return{role:'team',code,team};
-  return{role:'host'};
+/* ══ UTILS ══ */
+function generateCode(){
+  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let c='';for(let i=0;i<4;i++)c+=chars[Math.floor(Math.random()*chars.length)];
+  return c;
 }
 
-window.addEventListener('load',()=>{
-  const{role,code,team}=parseURL();
-  if(role==='team'){
-    myRole='team';myTeam=team;gameCode=code.toUpperCase();
-    showScreen('join');connectAsTeam();
-  } else {
-    myRole='host';
-    showScreen('lobby');buildLobbyTeams();
-  }
-});
-
-/* ══ LOBBY ══ */
-function buildLobbyTeams(){
-  const el=document.getElementById('teams-config');
-  el.innerHTML='';
-  for(let t=1;t<=4;t++){
-    el.innerHTML+=`<div class="team-cfg">
-      <h3 style="color:${TC[t-1]}">${TN[t-1]}</h3>
-      <div class="radio-row">
-        <label><input type="radio" name="tm${t}" value="off" checked onchange="onTeamCfg(${t},'off')"><span>Désactivée</span></label>
-        <label><input type="radio" name="tm${t}" value="player" onchange="onTeamCfg(${t},'player')"><span>Joueur</span></label>
-        <label><input type="radio" name="tm${t}" value="computer" onchange="onTeamCfg(${t},'computer')"><span>Ordi</span></label>
-      </div>
-    </div>`;
-  }
-  document.getElementById('input-code').addEventListener('input',checkLobbyReady);
-}
-const teamCfg={};
-window.onTeamCfg=function(t,v){teamCfg[t]=v==='off'?null:v;checkLobbyReady();};
-function checkLobbyReady(){
-  const code=document.getElementById('input-code').value.trim();
-  const hasPlayer=Object.values(teamCfg).includes('player');
-  document.getElementById('btn-create').disabled=!(code.length>=3&&hasPlayer);
-}
-
-window.createGame=async function(){
-  const code=document.getElementById('input-code').value.trim().toUpperCase();
-  gameCode=code;gameRef=ref(db,`games/${code}`);
-  const state={
-    phase:'theme_select',themeSelectTurn:0,activeThemes:[],
-    currentTeam:getFirstActive(),
-    positions:{t1:999,t2:999,t3:999,t4:999},
-    fromages:{t1:[false,false,false,false,false,false],t2:[false,false,false,false,false,false],t3:[false,false,false,false,false,false],t4:[false,false,false,false,false,false]},
-    scores:{t1:0,t2:0,t3:0,t4:0},
-    dieValue:null,reachable:[],selectedCell:null,
-    question:null,answeredBy:null,chosenAnswer:null,timerEnd:null,winner:null,
-    teams:teamCfg,
-  };
-  await set(gameRef,state);
-  showLinks(code);
-  onValue(gameRef,snap=>{if(snap.exists()){localState=snap.val();if(myRole==='host')renderHost(localState);}});
-  showHostControls();
-};
-
-function getFirstActive(){for(let t=1;t<=4;t++)if(teamCfg[t])return t;return 1;}
 function getActiveOrder(teams){const o=[];for(let t=1;t<=4;t++)if(teams&&teams[t])o.push(t);return o;}
 
-/* ══ LIENS ══ */
-function showLinks(code){
-  showScreen('links');
-  const base=location.origin+location.pathname;
-  const grid=document.getElementById('links-grid');
-  grid.innerHTML='';
-  for(let t=1;t<=4;t++){
-    if(!teamCfg[t])continue;
-    const url=`${base}?code=${code}&team=${t}`;
-    const card=document.createElement('div');
-    card.className='link-card';
-    card.style.borderColor=TC[t-1]+'66';
-    card.innerHTML=`<h3 style="color:${TC[t-1]}">${TN[t-1]}</h3>
-      <div class="link-url">${url}</div>
-      <button class="btn-outline" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('Lien copié !'))">📋 Copier</button>`;
-    grid.appendChild(card);
-  }
+function showScreen(s){
+  ['welcome','waiting','themes','game'].forEach(id=>{
+    const el=document.getElementById(`screen-${id}`);
+    if(el)el.style.display=el.id===`screen-${s}`?(id==='game'?'block':'flex'):'none';
+  });
 }
-window.goToGame=function(){showScreen('themes');renderHostThemes();};
 
-/* ══ CONNEXION ÉQUIPE ══ */
-async function connectAsTeam(){
-  gameRef=ref(db,`games/${gameCode}`);
-  const card=document.getElementById('join-card');
-  // Attendre que le jeu existe
-  let tries=0;
-  async function tryConnect(){
-    const snap=await get(gameRef);
-    if(!snap.exists()){
-      tries++;
-      if(tries>30){card.innerHTML=`<p style="color:#f87171">Partie introuvable. Vérifiez le lien.</p>`;return;}
-      setTimeout(tryConnect,1000);return;
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
+  if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);
+}
+window.toast=toast;
+
+/* ══ INIT ══ */
+window.addEventListener('load',()=>{
+  const p=new URLSearchParams(location.search);
+  const code=p.get('code')?.toUpperCase()||null;
+  if(code)joinGame(code);
+  else showScreen('welcome');
+});
+
+/* ══ WELCOME ══ */
+window.createNewGame=async function(){
+  setWelcomeError('');
+  const code=generateCode();
+  await joinGame(code);
+};
+
+window.joinWithCode=async function(){
+  setWelcomeError('');
+  const code=document.getElementById('join-code-input').value.trim().toUpperCase();
+  if(code.length<3){setWelcomeError('Code trop court.');return;}
+  await joinGame(code);
+};
+
+function setWelcomeError(msg){
+  const el=document.getElementById('welcome-error');
+  el.textContent=msg;el.style.display=msg?'block':'none';
+}
+
+/* ══ REJOINDRE / CRÉER ══ */
+async function joinGame(code){
+  showScreen('waiting');
+  document.getElementById('w-status').textContent='Connexion...';
+
+  gameCode=code;
+  gameRef=ref(db,`games/${code}`);
+
+  let assigned=null;
+  try{
+    const result=await runTransaction(gameRef,(current)=>{
+      if(!current){
+        assigned=1;
+        return createInitialState();
+      }
+      if(current.phase!=='waiting'){
+        // partie en cours — ne pas modifier, on rejoint en lecture seule
+        return current;
+      }
+      const connected=current.connectedTeams||{};
+      for(let t=1;t<=4;t++){
+        if(!connected[`t${t}`]){
+          assigned=t;
+          return{...current,connectedTeams:{...connected,[`t${t}`]:true}};
+        }
+      }
+      return current; // complet
+    });
+
+    if(!result.committed){
+      setWelcomeError('Impossible de rejoindre (erreur réseau).');
+      showScreen('welcome');return;
     }
-    localState=snap.val();
-    card.innerHTML=`
-      <div class="team-badge" style="background:${TC[myTeam-1]}33;border:3px solid ${TC[myTeam-1]};color:${TC[myTeam-1]}">${TN[myTeam-1]}</div>
-      <div class="join-status">Connecté en tant que <strong style="color:${TC[myTeam-1]}">${TN[myTeam-1]}</strong></div>
-      <div class="join-waiting"><div class="spinner"></div> En attente du démarrage...</div>`;
-    onValue(gameRef,snap=>{if(snap.exists()){localState=snap.val();renderTeam(localState);}});
+
+    if(assigned===null){
+      // Partie existante non-waiting → rejoindre en spectateur ? Pour l'instant on bloque.
+      const snap=await get(gameRef);
+      const s=snap.val();
+      if(s&&s.phase!=='waiting'){
+        setWelcomeError('Cette partie est déjà en cours.');
+        showScreen('welcome');return;
+      }
+      setWelcomeError('Partie complète (4 équipes max).');
+      showScreen('welcome');return;
+    }
+  }catch(e){
+    setWelcomeError('Erreur : '+e.message);
+    showScreen('welcome');return;
   }
-  tryConnect();
+
+  myTeam=assigned;
+  history.replaceState(null,'',`?code=${code}`);
+  setupPresence(code,myTeam);
+
+  onValue(gameRef,snap=>{
+    if(!snap.exists()){goToWelcome();return;}
+    localState=snap.val();
+    handleStateChange(localState);
+  });
 }
 
-/* ══ RENDU HÔTE ══ */
-function renderHost(state){
-  if(state.phase==='theme_select'){showScreen('themes');renderHostThemes();}
-  else{showScreen('game');renderGame(state);}
+function createInitialState(){
+  return{
+    phase:'waiting',
+    connectedTeams:{t1:true},
+    themeSelectTurn:0,
+    activeThemes:[],
+    currentTeam:1,
+    positions:{t1:999,t2:999,t3:999,t4:999},
+    fromages:{
+      t1:[false,false,false,false,false,false],
+      t2:[false,false,false,false,false,false],
+      t3:[false,false,false,false,false,false],
+      t4:[false,false,false,false,false,false],
+    },
+    scores:{t1:0,t2:0,t3:0,t4:0},
+    dieValue:null,reachable:[],selectedCell:null,
+    question:null,answeredBy:null,chosenAnswer:null,
+    timerEnd:null,winner:null,teams:null,
+  };
 }
 
-/* ══ RENDU ÉQUIPE ══ */
-function renderTeam(state){
+function setupPresence(code,team){
+  const presRef=ref(db,`games/${code}/connectedTeams/t${team}`);
+  const connRef=ref(db,'.info/connected');
+  onValue(connRef,snap=>{
+    if(snap.val()===true){
+      onDisconnect(presRef).remove();
+      set(presRef,true);
+    }
+  });
+  // Si toutes les autres équipes se déconnectent, terminer la partie
+  onValue(ref(db,`games/${code}/connectedTeams`),snap=>{
+    const present=snap.val()||{};
+    const count=Object.keys(present).length;
+    if(count===0&&localState&&localState.phase!=='waiting'&&localState.phase!=='ended'){
+      update(gameRef,{phase:'ended'});
+    }
+  });
+}
+
+/* ══ ROUTING ÉTAT ══ */
+function handleStateChange(state){
   if(!state)return;
+  if(state.phase==='ended'){showEndScreen();return;}
   if(state.winner){showWinner(state.winner);return;}
-  if(state.phase==='theme_select'){showScreen('themes');renderTeamThemes(state);}
-  else{showScreen('game');renderGame(state);}
+  if(state.phase==='waiting'){showScreen('waiting');renderWaiting(state);return;}
+  if(state.phase==='theme_select'){showScreen('themes');renderThemeScreen(state,myTeam);return;}
+  showScreen('game');renderGame(state);
 }
+
+/* ══ WAITING SCREEN ══ */
+function renderWaiting(state){
+  document.getElementById('w-code').textContent=gameCode||'—';
+  const myEl=document.getElementById('w-my-team');
+  myEl.textContent=TN[myTeam-1];myEl.style.color=TC[myTeam-1];
+
+  const connected=state.connectedTeams||{};
+  const list=document.getElementById('w-teams-list');
+  list.innerHTML='';
+  for(let t=1;t<=4;t++){
+    const isConn=!!connected[`t${t}`];
+    const isMe=t===myTeam;
+    list.innerHTML+=`<div class="w-team-item${isConn?' connected':''}">
+      <div class="w-team-dot" style="background:${isConn?TC[t-1]:'rgba(255,255,255,0.15)'}"></div>
+      <span class="w-team-name" style="color:${isConn?TC[t-1]:'rgba(255,255,255,0.3)'}">
+        ${TN[t-1]}${isMe?' <em style="opacity:.6;font-size:.8em">(vous)</em>':''}
+      </span>
+      ${isConn?'<span class="w-tag-ok">✓ connectée</span>':''}
+    </div>`;
+  }
+
+  const startBtn=document.getElementById('btn-start-game');
+  const waitMsg=document.getElementById('w-wait-msg');
+  if(myTeam===1){
+    startBtn.style.display='block';
+    waitMsg.style.display='none';
+  }else{
+    startBtn.style.display='none';
+    waitMsg.style.display='flex';
+  }
+  document.getElementById('w-status').textContent='';
+}
+
+window.startGame=async function(){
+  if(!gameRef||!localState)return;
+  const connected=localState.connectedTeams||{};
+  const teams={};
+  for(let t=1;t<=4;t++)teams[t]=connected[`t${t}`]?'player':null;
+  await update(gameRef,{phase:'theme_select',teams,currentTeam:1});
+};
+
+/* ══ FIN DE PARTIE ══ */
+window.askEndGame=function(){
+  document.getElementById('end-confirm').classList.add('vis');
+};
+window.cancelEndGame=function(){
+  document.getElementById('end-confirm').classList.remove('vis');
+};
+window.doEndGame=async function(){
+  document.getElementById('end-confirm').classList.remove('vis');
+  if(gameRef)await update(gameRef,{phase:'ended'});
+};
+
+function showEndScreen(){
+  showScreen('game'); // keep game visible behind overlay
+  document.getElementById('winner-overlay').classList.add('vis');
+  const h1=document.getElementById('winner-h1');
+  h1.textContent='Partie terminée';h1.style.color='rgba(255,255,255,0.85)';
+  document.getElementById('winner-p').textContent='La partie a été terminée.';
+}
+
+window.goToWelcome=function(){
+  document.getElementById('winner-overlay').classList.remove('vis');
+  if(gameRef){remove(gameRef).catch(()=>{});}
+  myTeam=null;gameCode=null;gameRef=null;localState=null;boardBuilt=false;activeThemes=[];
+  history.replaceState(null,'',location.pathname);
+  showScreen('welcome');
+};
 
 /* ══ SÉLECTION THÈMES ══ */
-function renderHostThemes(){
-  if(!localState)return;
-  renderThemeScreen(localState,myRole==='host'?null:myTeam);
-}
-function renderTeamThemes(state){renderThemeScreen(state,myTeam);}
-
 function renderThemeScreen(state,viewerTeam){
   const used=(state.activeThemes||[]).map(t=>t.id);
-  const order=getActiveOrder(state.teams||teamCfg);
+  const order=getActiveOrder(state.teams||{});
   const turn=state.themeSelectTurn||0;
   const choosingTeam=turn<6?order[turn%order.length]:null;
   const isMyTurn=viewerTeam&&choosingTeam===viewerTeam;
-  const isComputer=choosingTeam&&(state.teams||teamCfg)[choosingTeam]==='computer';
 
   document.getElementById('ts-who').textContent=choosingTeam?TN[choosingTeam-1]:'—';
   document.getElementById('ts-who').style.color=choosingTeam?TC[choosingTeam-1]:'#fff';
@@ -569,7 +668,6 @@ function renderThemeScreen(state,viewerTeam){
   grid.style.display=isMyTurn?'grid':'none';
   wait.style.display=isMyTurn?'none':'flex';
   document.getElementById('ts-wait-text').textContent=
-    isComputer?`${TN[choosingTeam-1]} (ordinateur) choisit...`:
     choosingTeam?`En attente de ${TN[choosingTeam-1]}...`:'Thèmes sélectionnés !';
 
   if(isMyTurn){
@@ -583,26 +681,14 @@ function renderThemeScreen(state,viewerTeam){
       grid.appendChild(btn);
     });
   }
-
-  // Auto ordi
-  if(isComputer&&myRole==='host'){
-    setTimeout(()=>{
-      if(!localState)return;
-      const u=(localState.activeThemes||[]).map(t=>t.id);
-      const avail=ALL_THEMES.filter(t=>!u.includes(t.id));
-      if(avail.length)pickTheme(localState,avail[Math.floor(Math.random()*avail.length)]);
-    },1000);
-  }
-  // Si une seule équipe humaine, elle choisit tout (isMyTurn sera vrai à chaque tour)
 }
 
 async function pickTheme(state,th){
   const newThemes=[...(state.activeThemes||[]),th];
   const newTurn=(state.themeSelectTurn||0)+1;
   if(newTurn>=6){
-    // 6 thèmes choisis → lancer le jeu
     await update(gameRef,{activeThemes:newThemes,themeSelectTurn:newTurn,phase:'roll'});
-  } else {
+  }else{
     await update(gameRef,{activeThemes:newThemes,themeSelectTurn:newTurn});
   }
 }
@@ -612,12 +698,11 @@ function renderGame(state){
   if(state.winner){showWinner(state.winner);return;}
   activeThemes=state.activeThemes||[];
   const colors=activeThemes.map(t=>t.color);
-  const isMyTurn=myRole==='host'?false:(state.currentTeam===myTeam);
+  const isMyTurn=state.currentTeam===myTeam;
   const ct=state.currentTeam||1;
 
   if(!boardBuilt){buildBoard(state);buildSidePanel(state);boardBuilt=true;}
 
-  // Top bar
   document.getElementById('turn-info').textContent=TN[ct-1]+(isMyTurn?' — Votre tour !':'');
   document.getElementById('turn-info').style.color=TC[ct-1];
   const pLabel={roll:'Lancer le dé',move:'Choisir une case',question:'Question',result:'Résultat'};
@@ -661,7 +746,7 @@ function renderAction(state,isMyTurn,colors){
         <span class="die-label">Lancer !</span>
       </button>
       <span class="action-msg">C'est votre tour !<br><strong>Cliquez sur le dé pour jouer.</strong></span>`;
-    } else {
+    }else{
       zone.innerHTML=`<div>${dieSVG(1,56,colors)}</div>
         <span class="action-msg">Tour de <strong>${TN[(state.currentTeam||1)-1]}</strong><br>En attente du lancer...</span>`;
     }
@@ -692,7 +777,6 @@ window.doRoll=async function(){
   const reach=getReachable(pos,val);
   const timerEnd=Date.now()+10000;
   await update(gameRef,{phase:'move',dieValue:val,reachable:reach,timerEnd,question:null,answeredBy:null,chosenAnswer:null});
-  // Fallback timer
   setTimeout(async()=>{
     const snap=await get(gameRef);const s=snap.val();
     if(s&&s.phase==='move'&&s.currentTeam===myTeam){
@@ -716,7 +800,7 @@ async function doMove(id){
     const idx=from.findIndex(v=>!v);
     themeId=idx>=0?(activeThemes[idx]?.id||activeThemes[0].id):activeThemes[0].id;
     toast('★ Thème libre !');
-  } else {
+  }else{
     const ci=caseColorIdx(id);
     themeId=ci>=0&&activeThemes[ci]?activeThemes[ci].id:(activeThemes[0]?.id||'fr');
   }
@@ -762,7 +846,7 @@ function renderQuestion(state,isMyTurn){
     if(state.answeredBy==null){res.className='lose';res.textContent='⏱️ Temps écoulé !';}
     else if(state.chosenAnswer===q.ans){res.className='win';res.textContent=`✅ Bonne réponse !${q.isCamembert?' 🧀 Fromage !':''}`;}
     else{res.className='lose';res.textContent=`❌ Mauvaise — bonne réponse : ${L[q.ans]}`;}
-  } else {res.className='';res.style.display='none';}
+  }else{res.className='';res.style.display='none';}
 }
 
 async function submitAnswer(state,chosen){
@@ -793,7 +877,7 @@ async function handleResult(state,chosen,ok){
 
 async function nextTurn(){
   const snap=await get(gameRef);const s=snap.val();if(!s)return;
-  const order=getActiveOrder(s.teams||teamCfg);
+  const order=getActiveOrder(s.teams||{});
   const idx=order.indexOf(s.currentTeam);const next=order[(idx+1)%order.length];
   await update(gameRef,{phase:'roll',currentTeam:next,dieValue:null,reachable:[],selectedCell:null,question:null,answeredBy:null,chosenAnswer:null,timerEnd:null});
 }
@@ -813,14 +897,12 @@ function svgRRect(svg,cx,cy,w,h,ang,fill,stroke,sw,rx){
 function buildBoard(state){
   const svg=document.getElementById('board-svg');svg.innerHTML='';
 
-  // Dégradé + defs clipPath pour camemberts
   const defs=mkSVG('defs');
   const grad=mkSVG('radialGradient');grad.setAttribute('id','bg-grad');grad.setAttribute('cx','50%');grad.setAttribute('cy','50%');grad.setAttribute('r','50%');
   const s0=mkSVG('stop');s0.setAttribute('offset','0%');s0.setAttribute('stop-color','#1E4A8A');
   const s1=mkSVG('stop');s1.setAttribute('offset','100%');s1.setAttribute('stop-color','#0D2347');
   grad.appendChild(s0);grad.appendChild(s1);defs.appendChild(grad);
 
-  // ClipPaths pour chaque case camembert
   for(let s=0;s<6;s++){
     const cp=mkSVG('clipPath');cp.setAttribute('id',`clip-cam-${s}`);
     const ang=s*60;const pos=casePos(100+s);const m=3;const half=CASE_SZ/2;
@@ -832,13 +914,11 @@ function buildBoard(state){
   }
   svg.appendChild(defs);
 
-  // 1. Fond
   const bg=mkSVG('circle');bg.setAttribute('cx',CX);bg.setAttribute('cy',CY);bg.setAttribute('r',R_BOARD+8);
   bg.setAttribute('fill','url(#bg-grad)');bg.setAttribute('stroke','#071530');bg.setAttribute('stroke-width','8');svg.appendChild(bg);
   const border=mkSVG('circle');border.setAttribute('cx',CX);border.setAttribute('cy',CY);border.setAttribute('r',R_BOARD+4);
   border.setAttribute('fill','none');border.setAttribute('stroke','rgba(255,215,0,0.3)');border.setAttribute('stroke-width','2');svg.appendChild(border);
 
-  // 2. Fond secteurs légers
   for(let s=0;s<6;s++){
     const a1=rad2(s*60-90),a2=rad2((s+1)*60-90),r=R_BOARD+2;
     const p=mkSVG('path');
@@ -846,13 +926,11 @@ function buildBoard(state){
     p.setAttribute('fill',BOARD_TC[s]+'12');svg.appendChild(p);
   }
 
-  // 3. Rayons fond
   for(let s=0;s<6;s++){
     const ang=s*60;const rMid=(R_HUB+R_SPOKE_OUT)/2;const p=polar(rMid,ang);
     svgRRect(svg,p.x,p.y,SPOKE_W,R_SPOKE_OUT-R_HUB,ang,BOARD_TC[s]+'40','none',0,0);
   }
 
-  // 4. Cases sur les rayons
   for(let s=0;s<6;s++){
     const ang=s*60;const seg_h=(R_SPOKE_OUT-R_HUB)/N_SPOKE;
     for(let k=0;k<N_SPOKE;k++){
@@ -865,7 +943,6 @@ function buildBoard(state){
     }
   }
 
-  // 5. Cases anneau extérieur (36)
   for(let i=0;i<36;i++){
     const ang=(i/36)*360;const p=polar(R_EXT,ang);
     const ci=EXT_SEQ[i];const isRej=REJOUER_IDX.has(i);
@@ -876,14 +953,11 @@ function buildBoard(state){
     const g=mkSVG('g');g.setAttribute('id',`case-${i}`);g.setAttribute('class','board-case');g.setAttribute('data-id',i);g.setAttribute('data-color',ci);
     svgRRect(g,p.x,p.y,CASE_SZ,CASE_SZ,ang,fill,stroke,sw,5);
     if(isRej){
-      // Dé SVG centré sur la case (non tourné pour rester lisible)
       const die=mkSVG('g');die.setAttribute('transform',`rotate(${ang},${p.x},${p.y})`);
-      // Fond blanc arrondi (mini dé)
       const dr=mkSVG('rect');dr.setAttribute('x',p.x-9);dr.setAttribute('y',p.y-9);
       dr.setAttribute('width',18);dr.setAttribute('height',18);dr.setAttribute('rx',4);
       dr.setAttribute('fill','white');dr.setAttribute('stroke','#FFD700');dr.setAttribute('stroke-width','1.5');
       die.appendChild(dr);
-      // Points dé (face 5)
       [[-4,-4],[4,-4],[0,0],[-4,4],[4,4]].forEach(([dx,dy])=>{
         const dot=mkSVG('circle');dot.setAttribute('cx',p.x+dx);dot.setAttribute('cy',p.y+dy);
         dot.setAttribute('r',2);dot.setAttribute('fill','#1a1a2e');die.appendChild(dot);
@@ -893,26 +967,20 @@ function buildBoard(state){
     svg.appendChild(g);
   }
 
-  // 6. Délimitation anneau
   [R_EXT+CASE_SZ/2+5, R_EXT-CASE_SZ/2-4].forEach((r,i)=>{
     const c=mkSVG('circle');c.setAttribute('cx',CX);c.setAttribute('cy',CY);c.setAttribute('r',r);
     c.setAttribute('fill','none');c.setAttribute('stroke',i===0?'rgba(255,255,255,0.22)':'rgba(255,255,255,0.14)');c.setAttribute('stroke-width',i===0?'2':'1.5');svg.appendChild(c);
   });
 
-  // 7. Cases camembert — carré coloré + triangle clipé pointe vers centre
   for(let s=0;s<6;s++){
     const ang=s*60;const p=polar(R_EXT,ang);
     const col=BOARD_TC[s];const cll=BOARD_TL[s];
-    const half=CASE_SZ/2;const m=9;  // marges plus grandes → triangle plus petit
-    // Pointe vers le centre = dans l'espace local, "bas" de la case (axe du rayon)
-    const tipX=p.x,tipY=p.y+half-m;   // bas = vers centre avant rotation
+    const half=CASE_SZ/2;const m=9;
+    const tipX=p.x,tipY=p.y+half-m;
     const blX=p.x-half+m,blY=p.y-half+m;
     const brX=p.x+half-m,brY=p.y-half+m;
-
     const g=mkSVG('g');g.setAttribute('id',`case-${100+s}`);g.setAttribute('class','board-case camembert-case');g.setAttribute('data-id',100+s);g.setAttribute('data-color',s);
-    // Fond carré
     svgRRect(g,p.x,p.y,CASE_SZ,CASE_SZ,ang,col,cll,2.5,5);
-    // Triangle clipé
     const gClip=mkSVG('g');gClip.setAttribute('transform',`rotate(${ang},${p.x},${p.y})`);gClip.setAttribute('clip-path',`url(#clip-cam-${s})`);
     const tri=mkSVG('polygon');tri.setAttribute('points',`${tipX},${tipY} ${blX},${blY} ${brX},${brY}`);
     tri.setAttribute('fill','rgba(255,255,255,0.85)');tri.setAttribute('stroke','rgba(255,255,255,0.5)');tri.setAttribute('stroke-width','1');
@@ -920,14 +988,12 @@ function buildBoard(state){
     svg.appendChild(g);
   }
 
-  // 8. Séparateurs radiaux
   for(let s=0;s<6;s++){
     const ang=s*60;const po=polar(R_BOARD,ang);const pi=polar(R_HUB+5,ang);
     const l=mkSVG('line');l.setAttribute('x1',pi.x);l.setAttribute('y1',pi.y);l.setAttribute('x2',po.x);l.setAttribute('y2',po.y);
     l.setAttribute('stroke','rgba(255,255,255,0.07)');l.setAttribute('stroke-width','1.5');svg.appendChild(l);
   }
 
-  // 9. Centre
   const cbg=mkSVG('circle');cbg.setAttribute('cx',CX);cbg.setAttribute('cy',CY);cbg.setAttribute('r',R_HUB+5);
   cbg.setAttribute('fill','#071530');cbg.setAttribute('stroke','rgba(255,215,0,0.9)');cbg.setAttribute('stroke-width','3');svg.appendChild(cbg);
   for(let i=0;i<6;i++){
@@ -954,7 +1020,7 @@ function buildSidePanel(state){
       <span class="tli-name">${th.label}</span></div>`;
   });
   const grid=document.getElementById('disques-grid');grid.innerHTML='';
-  const order=getActiveOrder(state.teams||teamCfg);
+  const order=getActiveOrder(state.teams||{});
   order.forEach(t=>{
     const wrap=document.createElement('div');wrap.className='disque-wrap';wrap.id=`dw-${t}`;
     wrap.innerHTML=`<div class="disque-name" style="color:${TC[t-1]}">${TN[t-1]}</div>
@@ -991,7 +1057,7 @@ function buildDisque(t,fromages,themes){
 
 function updateDisques(state){
   const themes=state.activeThemes||[];
-  const order=getActiveOrder(state.teams||teamCfg);
+  const order=getActiveOrder(state.teams||{});
   order.forEach(t=>buildDisque(t,state.fromages?.[`t${t}`]||[false,false,false,false,false,false],themes));
 }
 
@@ -1000,7 +1066,7 @@ function renderPions(state){
   document.querySelectorAll('.pion-g').forEach(e=>e.remove());
   const svg=document.getElementById('board-svg');
   const positions=state.positions||{};
-  const order=getActiveOrder(state.teams||teamCfg);
+  const order=getActiveOrder(state.teams||{});
   const offsets=[{dx:-9,dy:-9},{dx:9,dy:-9},{dx:-9,dy:9},{dx:9,dy:9}];
   for(let t=1;t<=4;t++){
     if(!order.includes(t))continue;
@@ -1036,44 +1102,8 @@ function showWinner(team){
   document.getElementById('winner-overlay').classList.add('vis');
   document.getElementById('winner-h1').style.color=TC[team-1];
   document.getElementById('winner-h1').textContent=`${TN[team-1]} gagne !`;
+  document.getElementById('winner-p').textContent='Tous les fromages collectés ! 🧀';
 }
-
-/* ══ UTILS ══ */
-function showScreen(s){
-  ['lobby','links','join','themes','game'].forEach(id=>{
-    const el=document.getElementById(`screen-${id}`);
-    if(el)el.style.display=el.id===`screen-${s}`?(id==='game'?'block':'flex'):'none';
-  });
-}
-let toastT=null;
-function toast(msg){
-  const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
-  if(toastT)clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2800);
-}
-window.toast=toast;
-
-/* ══ HOST CONTROLS ══ */
-function showHostControls(){
-  const el=document.getElementById('host-controls');
-  if(el)el.style.display='flex';
-}
-function toggleConfirm(show){
-  const el=document.getElementById('confirm-kill');
-  if(el)el.classList.toggle('vis',show);
-}
-window.toggleConfirm=toggleConfirm;
-
-window.doKillGame=async function(){
-  if(!gameRef){alert('Aucune partie active.');return;}
-  try{
-    await remove(gameRef);
-    toast('✅ Partie supprimée de Firebase.');
-    toggleConfirm(false);
-    setTimeout(()=>location.reload(),1500);
-  }catch(e){
-    toast('❌ Erreur : '+e.message);
-  }
-};
 </script>
 </body>
 </html>
