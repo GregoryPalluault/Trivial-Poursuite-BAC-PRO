@@ -556,13 +556,13 @@ function renderThemeScreen(state,viewerTeam){
   const used=(state.activeThemes||[]).map(t=>t.id);
   const order=getActiveOrder(state.teams||teamCfg);
   const turn=state.themeSelectTurn||0;
-  const choosingTeam=turn<order.length?order[turn]:null;
+  const choosingTeam=turn<6?order[turn%order.length]:null;
   const isMyTurn=viewerTeam&&choosingTeam===viewerTeam;
   const isComputer=choosingTeam&&(state.teams||teamCfg)[choosingTeam]==='computer';
 
   document.getElementById('ts-who').textContent=choosingTeam?TN[choosingTeam-1]:'—';
   document.getElementById('ts-who').style.color=choosingTeam?TC[choosingTeam-1]:'#fff';
-  document.getElementById('ts-sub').textContent=`Tour ${turn+1}/${order.length} — choisissez votre thème`;
+  document.getElementById('ts-sub').textContent=`Thème ${turn+1}/6 — choisissez votre thème`;
 
   const grid=document.getElementById('themes-grid-pick');
   const wait=document.getElementById('ts-waiting');
