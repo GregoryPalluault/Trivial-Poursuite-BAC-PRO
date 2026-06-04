@@ -414,21 +414,26 @@ function getAdj(pos){
   if(pos%6===0){const s=pos/6;a.push(100+s%6);}
   return a;
 }
-function getReachable(pos,die){
-  // DFS avec suivi du chemin courant (pas de revisit dans le chemin)
-  // Contrairement au BFS, cela trouve TOUTES les cellules atteignables en
-  // exactement `die` pas, même si un raccourci plus court existe par ailleurs.
-  const results=new Set();
-  const path=new Set([pos]);
-  function dfs(cur,rem){
-    if(rem===0){results.add(cur);return;}
-    for(const nb of getAdj(cur)){
-      if(!path.has(nb)){path.add(nb);dfs(nb,rem-1);path.delete(nb);}
+function getReachable(startPos, die) {
+  // BFS avec état (cellule, cellule_précédente) — interdit le demi-tour immédiat
+  // mais autorise les changements de direction aux carrefours.
+  const results = new Set();
+  const visited = new Set([`${startPos},-1`]);
+  const queue = [{id: startPos, prev: -1, d: 0}];
+  while (queue.length) {
+    const {id, prev, d} = queue.shift();
+    if (d === die) { results.add(id); continue; }
+    for (const nb of getAdj(id)) {
+      if (nb === prev) continue;
+      const key = `${nb},${id}`;
+      if (!visited.has(key)) {
+        visited.add(key);
+        queue.push({id: nb, prev: id, d: d + 1});
+      }
     }
   }
-  dfs(pos,die);
-  results.delete(pos);
-  return[...results];
+  results.delete(startPos);
+  return [...results];
 }
 
 /* ══ DÉ SVG (sans couronne colorée) ══ */
