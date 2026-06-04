@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="31" fill="#0f2540" stroke="#f0c040" stroke-width="2"/>
+  <!-- 6 wedges (pastel colors) -->
+  <path d="M32 32 L32 2 A30 30 0 0 1 57.98 17 Z" fill="#FFAAB5" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <path d="M32 32 L57.98 17 A30 30 0 0 1 57.98 47 Z" fill="#FFD4A3" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <path d="M32 32 L57.98 47 A30 30 0 0 1 32 62 Z" fill="#A8E6CF" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <path d="M32 32 L32 62 A30 30 0 0 1 6.02 47 Z" fill="#C5B9F5" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <path d="M32 32 L6.02 47 A30 30 0 0 1 6.02 17 Z" fill="#FFF3A3" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <path d="M32 32 L6.02 17 A30 30 0 0 1 32 2 Z" fill="#A3D8F4" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+  <!-- Centre -->
+  <circle cx="32" cy="32" r="10" fill="#1a3a5c" stroke="#f0c040" stroke-width="1.5"/>
+  <text x="32" y="37" text-anchor="middle" font-size="11" fill="#f0c040" font-weight="bold" font-family="sans-serif">TP</text>
+</svg>
