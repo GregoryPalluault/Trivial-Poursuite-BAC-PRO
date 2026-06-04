@@ -364,8 +364,9 @@ const CASE_SZ=44,SPOKE_W=52,N_SPOKE=4;
 const BOARD_TC=['#D62839','#F7A325','#0B8A5A','#5B4FCF','#E8C400','#0096C7'];
 const BOARD_TL=['#FF6B7A','#FFD080','#4DC996','#A89FEF','#F5E060','#56C8F0'];
 const BEIGE='#E8D5B0',BEIGE_S='#C8AE80';
-const EXT_SEQ=[0,-1,1,2,-1,3, 4,-1,5,0,-1,1, 2,-1,3,4,-1,5, 0,-1,1,2,-1,3, 4,-1,5,0,-1,1, 2,-1,3,4,-1,5];
-const REJOUER_IDX=new Set([6,12,18,24,30]);
+// Arc pattern per 6 positions: [cam_pos, c+0, c+1, rejouer, c+2, c+3], colors rotate by 2 each arc
+const EXT_SEQ=[-1,0,1,-1,2,3,-1,4,5,-1,0,1,-1,2,3,-1,4,5,-1,0,1,-1,2,3,-1,4,5,-1,0,1,-1,2,3,-1,4,5];
+const REJOUER_IDX=new Set([3,9,15,21,27,33]);
 const SPOKE_COLORS=[[0,1,2,3],[4,5,0,1],[2,3,4,5],[0,1,2,3],[4,5,0,1],[2,3,4,5]];
 
 function rad(deg){return(deg-90)*Math.PI/180;}
@@ -650,12 +651,17 @@ function renderThemeScreen(state,viewerTeam){
     choosingTeam?`En attente de ${TN[choosingTeam-1]}...`:'Thèmes sélectionnés !';
   if(isMyTurn){
     grid.innerHTML='';
+    const nextColorIdx=used.length;
+    const nextColor=BOARD_TC[nextColorIdx]||'#888';
     ALL_THEMES.forEach(th=>{
+      const isUsed=used.includes(th.id);
+      const usedIdx=used.indexOf(th.id);
+      const displayColor=isUsed?BOARD_TC[usedIdx]:nextColor;
       const btn=document.createElement('div');
-      btn.className='tpick'+(used.includes(th.id)?' used':'');
-      btn.style.background=th.color+'cc';
+      btn.className='tpick'+(isUsed?' used':'');
+      btn.style.background=displayColor+'cc';
       btn.innerHTML=`<span class="tpick-emoji">${th.emoji}</span><div class="tpick-name">${th.label}</div>`;
-      if(!used.includes(th.id))btn.addEventListener('click',()=>pickTheme(state,th));
+      if(!isUsed)btn.addEventListener('click',()=>pickTheme(state,th));
       grid.appendChild(btn);
     });
   }
@@ -672,7 +678,6 @@ async function pickTheme(state,th){
 function renderGame(state){
   if(state.winner){showWinner(state.winner);return;}
   activeThemes=state.activeThemes||[];
-  const colors=activeThemes.map(t=>t.color);
   const isMyTurn=state.currentTeam===myTeam;
   const ct=state.currentTeam||1;
   if(!boardBuilt){buildBoard(state);buildSidePanel(state);boardBuilt=true;}
@@ -681,7 +686,7 @@ function renderGame(state){
   const pLabel={roll:'Lancer le dé',move:'Choisir une case',question:'Question',result:'Résultat'};
   document.getElementById('phase-info').textContent=pLabel[state.phase]||'';
   renderTimer(state);
-  renderAction(state,isMyTurn,colors);
+  renderAction(state,isMyTurn);
   renderQuestion(state,isMyTurn);
   renderPions(state);
   renderHighlight(state,isMyTurn);
@@ -706,7 +711,7 @@ function renderTimer(state){
 }
 
 /* ══ ACTION ZONE ══ */
-function renderAction(state,isMyTurn,colors){
+function renderAction(state,isMyTurn){
   const zone=document.getElementById('action-zone');
   document.getElementById('question-panel').classList.remove('vis');
   if(state.phase==='roll'){
@@ -792,10 +797,12 @@ async function doMove(id){
 function renderQuestion(state,isMyTurn){
   if(state.phase!=='question'&&state.phase!=='result'){document.getElementById('question-panel').classList.remove('vis');return;}
   const q=state.question;if(!q)return;
-  const th=activeThemes.find(t=>t.id===q.themeId)||activeThemes[0]||{color:'#888',emoji:'❓',label:'Thème'};
+  const thIdx=activeThemes.findIndex(t=>t.id===q.themeId);
+  const th=activeThemes[thIdx]||activeThemes[0]||{emoji:'❓',label:'Thème'};
+  const thColor=thIdx>=0?BOARD_TC[thIdx]:(BOARD_TC[0]||'#888');
   const badge=document.getElementById('q-badge');
   badge.textContent=`${th.emoji} ${th.label}`;
-  badge.style.cssText=`background:${th.color}33;color:${th.color};border:1px solid ${th.color}55;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;align-self:flex-start;`;
+  badge.style.cssText=`background:${thColor}33;color:${thColor};border:1px solid ${thColor}55;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;align-self:flex-start;`;
   document.getElementById('q-text').textContent=q.text;
   const grid=document.getElementById('q-grid');grid.innerHTML='';
   const L=['A','B','C','D'];
@@ -991,9 +998,10 @@ function buildBoard(state){
 function buildSidePanel(state){
   const themes=state.activeThemes||[];
   const leg=document.getElementById('theme-legend');leg.innerHTML='';
-  themes.forEach(th=>{
-    leg.innerHTML+=`<div class="theme-leg-item" style="background:${th.color}18;border:1px solid ${th.color}33">
-      <div class="tli-dot" style="background:${th.color}"></div>
+  themes.forEach((th,i)=>{
+    const c=BOARD_TC[i]||'#888';
+    leg.innerHTML+=`<div class="theme-leg-item" style="background:${c}18;border:1px solid ${c}33">
+      <div class="tli-dot" style="background:${c}"></div>
       <span style="font-size:.95rem">${th.emoji}</span>
       <span class="tli-name">${th.label}</span></div>`;
   });
@@ -1017,7 +1025,7 @@ function buildDisque(t,fromages,themes){
   svg.appendChild(bgc);
   for(let i=0;i<6;i++){
     const a1=rad2(i*60-90),a2=rad2((i+1)*60-90),rr=r-2;
-    const earned=fromages[i];const color=themes[i]?themes[i].color:'#333';
+    const earned=fromages[i];const color=themes[i]?BOARD_TC[i]:'#333';
     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
     path.setAttribute('d',`M ${cx} ${cy} L ${cx+rr*Math.cos(a1)} ${cy+rr*Math.sin(a1)} A ${rr} ${rr} 0 0 1 ${cx+rr*Math.cos(a2)} ${cy+rr*Math.sin(a2)} Z`);
     path.setAttribute('fill',earned?color:'rgba(255,255,255,0.04)');
