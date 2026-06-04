@@ -464,6 +464,7 @@ function dieSVG(face,sz=64){
 let myTeam=null;
 let gameCode=null,gameRef=null,localState=null,timerInt=null,boardBuilt=false;
 let activeThemes=[];
+let moveTimerId=null,questionTimerId=null;
 
 /* ══ UTILS ══ */
 function generateCode(){
@@ -587,6 +588,10 @@ function setupPresence(code,team){
 /* ══ ROUTING ══ */
 function handleStateChange(state){
   if(!state)return;
+  // Si ce n'est plus notre tour, annuler les timers en attente
+  if(state.currentTeam&&state.currentTeam!==myTeam){
+    clearTimeout(moveTimerId);clearTimeout(questionTimerId);
+  }
   if(state.phase==='ended'){showEndScreen();return;}
   if(state.winner){showWinner(state.winner);return;}
   if(state.phase==='waiting'){showScreen('waiting');renderWaiting(state);return;}
@@ -755,25 +760,23 @@ function renderAction(state,isMyTurn){
 
 window.doRoll=async function(){
   if(!localState||localState.currentTeam!==myTeam)return;
+  clearTimeout(moveTimerId);clearTimeout(questionTimerId);
   const btn=document.getElementById('btn-roll');if(btn)btn.disabled=true;
   const icon=document.querySelector('.die-icon');if(icon)icon.classList.add('rolling');
   await new Promise(r=>setTimeout(r,560));
   const val=Math.floor(Math.random()*6)+1;
-  const pos=localState.positions?.[`t${myTeam}`]??200;
+  const pos=localState.positions?.[`t${myTeam}`]??999;
   const reach=getReachable(pos,val);
-  const timerEnd=Date.now()+10000;
+  const timerEnd=Date.now()+15000;
   await update(gameRef,{phase:'move',dieValue:val,reachable:reach,timerEnd,question:null,answeredBy:null,chosenAnswer:null});
-  setTimeout(async()=>{
+  moveTimerId=setTimeout(async()=>{
     const snap=await get(gameRef);const s=snap.val();
-    if(s&&s.phase==='move'&&s.currentTeam===myTeam){
-      const r=s.reachable||[];
-      if(r.length>0)await doMove(r[Math.floor(Math.random()*r.length)]);
-      else await nextTurn();
-    }
-  },10600);
+    if(s&&s.phase==='move'&&s.currentTeam===myTeam)await nextTurn();
+  },15600);
 };
 
 async function doMove(id){
+  clearTimeout(moveTimerId);
   if(!localState||localState.currentTeam!==myTeam||localState.phase!=='move')return;
   const pos={...localState.positions,[`t${myTeam}`]:id};
   if(id===999||isRejouer(id)){
@@ -791,17 +794,17 @@ async function doMove(id){
     themeId=ci>=0&&activeThemes[ci]?activeThemes[ci].id:(activeThemes[0]?.id||'fr');
   }
   const q=getQ(themeId);
-  const timerEnd=Date.now()+30000;
+  const timerEnd=Date.now()+45000;
   await update(gameRef,{
     phase:'question',positions:pos,reachable:[],selectedCell:id,
     question:{text:q.q,opts:q.opts,ans:q.ans,themeId,isCamembert:isCamembert(id),cellId:id},
     answeredBy:null,chosenAnswer:null,timerEnd,
   });
-  setTimeout(async()=>{
+  questionTimerId=setTimeout(async()=>{
     const snap=await get(gameRef);const s=snap.val();
     if(s&&s.phase==='question'&&s.currentTeam===myTeam&&s.answeredBy==null)
       await handleResult(s,null,false);
-  },30600);
+  },45600);
 }
 
 /* ══ QUESTION ══ */
