@@ -415,10 +415,20 @@ function getAdj(pos){
   return a;
 }
 function getReachable(pos,die){
-  const vis=new Map();const q=[{id:pos,d:0}];vis.set(pos,0);
-  while(q.length){const{id,d}=q.shift();if(d>=die)continue;for(const nb of getAdj(id))if(!vis.has(nb)){vis.set(nb,d+1);q.push({id:nb,d:d+1});}}
-  const r=[];for(const[id,d]of vis)if(id!==pos&&d===die)r.push(id);
-  return r;
+  // DFS avec suivi du chemin courant (pas de revisit dans le chemin)
+  // Contrairement au BFS, cela trouve TOUTES les cellules atteignables en
+  // exactement `die` pas, même si un raccourci plus court existe par ailleurs.
+  const results=new Set();
+  const path=new Set([pos]);
+  function dfs(cur,rem){
+    if(rem===0){results.add(cur);return;}
+    for(const nb of getAdj(cur)){
+      if(!path.has(nb)){path.add(nb);dfs(nb,rem-1);path.delete(nb);}
+    }
+  }
+  dfs(pos,die);
+  results.delete(pos);
+  return[...results];
 }
 
 /* ══ DÉ SVG (sans couronne colorée) ══ */
