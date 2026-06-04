@@ -400,21 +400,29 @@ function caseColorIdx(id){
 
 function getAdj(pos){
   const a=[];
+  // Centre → 6 camemberts
   if(pos===999){for(let i=0;i<6;i++)a.push(100+i);return a;}
+  // Camembert → anneau (cases adjacentes, pas les multiples de 6), centre, case rayon externe
   if(isCamembert(pos)){
-    const s=pos-100;a.push(999);
-    a.push(s*6);
-    a.push(200+s*N_SPOKE+N_SPOKE);
+    const s=pos-100;
+    a.push((s*6-1+36)%36); // ring avant le spoke (jamais multiple de 6)
+    a.push((s*6+1)%36);    // ring après le spoke
+    a.push(999);
+    a.push(200+s*N_SPOKE+N_SPOKE); // case rayon la plus externe
     return a;
   }
+  // Cases rayons
   if(isSpokeCase(pos)){
     const sid=pos-201;const s=Math.floor(sid/N_SPOKE);const k=sid%N_SPOKE;
     if(k===0)a.push(999);else a.push(200+s*N_SPOKE+k);
     if(k===N_SPOKE-1)a.push(100+s);else a.push(200+s*N_SPOKE+k+2);
     return a;
   }
-  a.push((pos+1)%36,(pos-1+36)%36);
-  if(pos%6===0){const s=pos/6;a.push(100+s%6);}
+  // Anneau extérieur : les multiples de 6 sont remplacés par le camembert correspondant
+  const nxt=(pos+1)%36;
+  const prv=(pos-1+36)%36;
+  a.push(nxt%6===0?100+nxt/6:nxt);
+  a.push(prv%6===0?100+prv/6:prv);
   return a;
 }
 function getReachable(startPos, die) {
@@ -936,24 +944,13 @@ function buildBoard(state){
     const g=mkSVG('g');g.setAttribute('id',`case-${i}`);g.setAttribute('class','board-case');g.setAttribute('data-id',i);g.setAttribute('data-color',ci);
     svgRRect(g,p.x,p.y,CASE_SZ,CASE_SZ,ang,fill,stroke,sw,5);
     if(isRej){
-      // Flèche circulaire ↺ pour les cases Rejouer
-      const rArr=9;
-      // Arc 300° (de 30° à 330°)
-      const aStart=rad2(40),aEnd=rad2(320);
-      const sx=p.x+rArr*Math.cos(aStart),sy=p.y+rArr*Math.sin(aStart);
-      const ex=p.x+rArr*Math.cos(aEnd),ey=p.y+rArr*Math.sin(aEnd);
-      const arc=mkSVG('path');
-      arc.setAttribute('d',`M ${sx} ${sy} A ${rArr} ${rArr} 0 1 1 ${ex} ${ey}`);
-      arc.setAttribute('fill','none');arc.setAttribute('stroke','#FFD700');arc.setAttribute('stroke-width','2.5');arc.setAttribute('stroke-linecap','round');
-      g.appendChild(arc);
-      // Tête de flèche au bout de l'arc
-      const headAng=rad2(320);
-      const hx=p.x+rArr*Math.cos(headAng),hy=p.y+rArr*Math.sin(headAng);
-      const perpAng=headAng+Math.PI/2;
-      const arr=mkSVG('polygon');
-      arr.setAttribute('points',`${hx+5*Math.cos(headAng-0.5)},${hy+5*Math.sin(headAng-0.5)} ${hx+5*Math.cos(headAng+0.5)},${hy+5*Math.sin(headAng+0.5)} ${hx-4*Math.cos(perpAng)},${hy-4*Math.sin(perpAng)}`);
-      arr.setAttribute('fill','#FFD700');
-      g.appendChild(arr);
+      const sym=mkSVG('text');
+      sym.setAttribute('x',p.x);sym.setAttribute('y',p.y+6);
+      sym.setAttribute('text-anchor','middle');sym.setAttribute('font-size','18');
+      sym.setAttribute('fill','#FFD700');sym.setAttribute('font-weight','bold');
+      sym.setAttribute('pointer-events','none');
+      sym.textContent='↺';
+      g.appendChild(sym);
     }
     svg.appendChild(g);
   }
