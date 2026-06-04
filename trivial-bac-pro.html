@@ -400,7 +400,7 @@ function getAdj(pos){
   if(pos===999){for(let i=0;i<6;i++)a.push(100+i);return a;}
   if(isCamembert(pos)){
     const s=pos-100;a.push(999);
-    const base=s*6;a.push(base,(base+5)%36);
+    a.push(s*6);
     a.push(200+s*N_SPOKE+N_SPOKE);
     return a;
   }
