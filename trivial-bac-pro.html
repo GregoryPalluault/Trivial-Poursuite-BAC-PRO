@@ -991,7 +991,9 @@ function buildBoard(state){
 
   // Centre — cercle blanc uni
   const cbg=mkSVG('circle');cbg.setAttribute('cx',CX);cbg.setAttribute('cy',CY);cbg.setAttribute('r',R_HUB+5);
-  cbg.setAttribute('fill','white');cbg.setAttribute('stroke','rgba(255,215,0,0.85)');cbg.setAttribute('stroke-width','3');svg.appendChild(cbg);
+  cbg.setAttribute('fill','white');cbg.setAttribute('stroke','#071530');cbg.setAttribute('stroke-width','8');svg.appendChild(cbg);
+  const cborder=mkSVG('circle');cborder.setAttribute('cx',CX);cborder.setAttribute('cy',CY);cborder.setAttribute('r',R_HUB+5);
+  cborder.setAttribute('fill','none');cborder.setAttribute('stroke','rgba(255,215,0,0.3)');cborder.setAttribute('stroke-width','2');svg.appendChild(cborder);
   // Zone cliquable transparente par dessus
   const cc=mkSVG('circle');cc.setAttribute('id','case-999');cc.setAttribute('class','board-case');cc.setAttribute('data-id',999);cc.setAttribute('cx',CX);cc.setAttribute('cy',CY);
   cc.setAttribute('r',R_HUB+5);cc.setAttribute('fill','transparent');cc.setAttribute('stroke','none');svg.appendChild(cc);
