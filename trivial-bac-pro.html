@@ -1024,10 +1024,12 @@ function buildSidePanel(state){
 function buildDisque(t,fromages,themes){
   const svg=document.getElementById(`disque-${t}`);if(!svg)return;
   svg.innerHTML='';const cx=55,cy=55,r=50;
+  // Fond + bord épais sombre (comme le plateau)
   const bgc=document.createElementNS('http://www.w3.org/2000/svg','circle');
   bgc.setAttribute('cx',cx);bgc.setAttribute('cy',cy);bgc.setAttribute('r',r);
-  bgc.setAttribute('fill','#0f2540');bgc.setAttribute('stroke',TC[t-1]);bgc.setAttribute('stroke-width','2');
+  bgc.setAttribute('fill','#0f2540');bgc.setAttribute('stroke','#071530');bgc.setAttribute('stroke-width','8');
   svg.appendChild(bgc);
+  // 6 parts
   for(let i=0;i<6;i++){
     const a1=rad2(i*60-90),a2=rad2((i+1)*60-90),rr=r-2;
     const earned=fromages[i];const color=themes[i]?BOARD_TC[i]:'#333';
@@ -1037,9 +1039,20 @@ function buildDisque(t,fromages,themes){
     path.setAttribute('stroke','rgba(255,255,255,0.12)');path.setAttribute('stroke-width','1');
     svg.appendChild(path);
   }
+  // Liseré doré (comme le plateau)
+  const border=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  border.setAttribute('cx',cx);border.setAttribute('cy',cy);border.setAttribute('r',r);
+  border.setAttribute('fill','none');border.setAttribute('stroke','rgba(255,215,0,0.3)');border.setAttribute('stroke-width','2');
+  svg.appendChild(border);
+  // Centre : numéro équipe, même style double-bord
   const ctr=document.createElementNS('http://www.w3.org/2000/svg','circle');
   ctr.setAttribute('cx',cx);ctr.setAttribute('cy',cy);ctr.setAttribute('r',13);
-  ctr.setAttribute('fill',TC[t-1]);svg.appendChild(ctr);
+  ctr.setAttribute('fill',TC[t-1]);ctr.setAttribute('stroke','#071530');ctr.setAttribute('stroke-width','4');
+  svg.appendChild(ctr);
+  const ctrBorder=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  ctrBorder.setAttribute('cx',cx);ctrBorder.setAttribute('cy',cy);ctrBorder.setAttribute('r',13);
+  ctrBorder.setAttribute('fill','none');ctrBorder.setAttribute('stroke','rgba(255,215,0,0.3)');ctrBorder.setAttribute('stroke-width','1.5');
+  svg.appendChild(ctrBorder);
   const num=document.createElementNS('http://www.w3.org/2000/svg','text');
   num.setAttribute('x',cx);num.setAttribute('y',cy+5);num.setAttribute('text-anchor','middle');
   num.setAttribute('font-size','13');num.setAttribute('fill','#fff');num.setAttribute('font-weight','bold');
