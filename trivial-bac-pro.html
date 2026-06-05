@@ -401,22 +401,21 @@ function caseColorIdx(id){
 
 function getAdj(pos){
   const a=[];
-  // Centre → 6 camemberts
-  if(pos===999){for(let i=0;i<6;i++)a.push(100+i);return a;}
-  // Camembert → anneau (cases adjacentes, pas les multiples de 6), centre, case rayon externe
+  // Centre → cases rayon les plus internes (k=0), visuellement proches du centre
+  if(pos===999){for(let s=0;s<6;s++)a.push(201+s*N_SPOKE);return a;}
+  // Camembert → anneau (cases adjacentes), case rayon la plus externe (pas de lien direct centre)
   if(isCamembert(pos)){
     const s=pos-100;
-    a.push((s*6-1+36)%36); // ring avant le spoke (jamais multiple de 6)
+    a.push((s*6-1+36)%36); // ring avant le spoke
     a.push((s*6+1)%36);    // ring après le spoke
-    a.push(999);
     a.push(200+s*N_SPOKE+N_SPOKE); // case rayon la plus externe
     return a;
   }
   // Cases rayons
   if(isSpokeCase(pos)){
     const sid=pos-201;const s=Math.floor(sid/N_SPOKE);const k=sid%N_SPOKE;
-    if(k===0)a.push(999);else a.push(200+s*N_SPOKE+k);
-    if(k===N_SPOKE-1)a.push(100+s);else a.push(200+s*N_SPOKE+k+2);
+    if(k===0)a.push(999);else a.push(200+s*N_SPOKE+k); // vers centre
+    if(k===N_SPOKE-1)a.push(100+s);else a.push(200+s*N_SPOKE+k+2); // vers camembert
     return a;
   }
   // Anneau extérieur : les multiples de 6 sont remplacés par le camembert correspondant
