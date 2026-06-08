@@ -66,6 +66,7 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 #top-bar{background:rgba(0,0,0,0.35);border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;}
 #turn-info{font-family:'Fredoka One',cursive;font-size:1.2rem;}
 #phase-info{font-size:0.78rem;color:rgba(255,255,255,0.5);}
+#my-team-badge{font-size:.8rem;font-weight:700;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);white-space:nowrap;}
 #timer-wrap{display:flex;align-items:center;gap:8px;}
 #timer-bar-bg{width:100px;height:8px;background:rgba(255,255,255,0.1);border-radius:5px;overflow:hidden;}
 #timer-bar{height:100%;border-radius:5px;transition:width .4s linear,background .4s;background:#4ade80;width:100%;}
@@ -201,6 +202,7 @@ body{background:var(--bg);font-family:'Nunito',sans-serif;min-height:100vh;overf
 <div id="screen-game">
   <div id="top-bar">
     <div><div id="turn-info">—</div><div id="phase-info"></div></div>
+    <div id="my-team-badge"></div>
     <div id="timer-wrap">
       <div id="timer-bar-bg"><div id="timer-bar"></div></div>
       <div id="timer-num">—</div>
@@ -772,6 +774,10 @@ function renderGame(state){
   if(!boardBuilt){buildBoard(state);buildSidePanel(state);boardBuilt=true;}
   document.getElementById('turn-info').textContent=TN[ct-1]+(isMyTurn?' — Votre tour !':'');
   document.getElementById('turn-info').style.color=TC[ct-1];
+  const badge=document.getElementById('my-team-badge');
+  badge.textContent=`Vous jouez pour : ${TN[myTeam-1]}`;
+  badge.style.color=TC[myTeam-1];
+  badge.style.borderColor=TC[myTeam-1];
   const pLabel={roll:'Lancer le dé',move:'Choisir une case',question:'Question',result:'Résultat'};
   document.getElementById('phase-info').textContent=pLabel[state.phase]||'';
   renderTimer(state);
