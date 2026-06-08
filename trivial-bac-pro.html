@@ -432,7 +432,15 @@ const QUESTIONS={
     {q:"La norme ISO concerne...",opts:["Les impôts","La qualité et normalisation","Les salaires","Les brevets"],ans:1},
   ],
 };
-function getQ(tid){const p=QUESTIONS[tid]||QUESTIONS.fr;return p[Math.floor(Math.random()*p.length)];}
+function getQ(tid,asked){
+  const p=QUESTIONS[tid]||QUESTIONS.fr;
+  const used=asked||[];
+  let avail=p.map((_,i)=>i).filter(i=>!used.includes(i));
+  let reset=false;
+  if(avail.length===0){avail=p.map((_,i)=>i);reset=true;}
+  const idx=avail[Math.floor(Math.random()*avail.length)];
+  return{idx,q:p[idx],newAsked:reset?[idx]:[...used,idx]};
+}
 
 /* ══ GÉOMÉTRIE PLATEAU ══ */
 const CX=350,CY=350;
@@ -644,7 +652,7 @@ function createInitialState(){
     },
     scores:{t1:0,t2:0,t3:0,t4:0},
     dieValue:null,reachable:[],selectedCell:null,
-    question:null,answeredBy:null,chosenAnswer:null,timerEnd:null,winner:null,teams:null,
+    question:null,answeredBy:null,chosenAnswer:null,timerEnd:null,winner:null,teams:null,askedQ:{},
   };
 }
 
@@ -872,12 +880,15 @@ async function doMove(id){
     const ci=caseColorIdx(id);
     themeId=ci>=0&&activeThemes[ci]?activeThemes[ci].id:(activeThemes[0]?.id||'fr');
   }
-  const q=getQ(themeId);
+  const askedQ=localState.askedQ||{};
+  const picked=getQ(themeId,askedQ[themeId]);
+  const q=picked.q;
   const timerEnd=Date.now()+45000;
   await update(gameRef,{
     phase:'question',positions:pos,reachable:[],selectedCell:id,
     question:{text:q.q,opts:q.opts,ans:q.ans,themeId,isCamembert:isCamembert(id),cellId:id},
     answeredBy:null,chosenAnswer:null,timerEnd,
+    askedQ:{...askedQ,[themeId]:picked.newAsked},
   });
   questionTimerId=setTimeout(async()=>{
     const snap=await get(gameRef);const s=snap.val();
